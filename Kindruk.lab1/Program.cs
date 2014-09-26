@@ -15,6 +15,8 @@ namespace Kindruk.lab1
             Console.WriteLine(CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator);
             var m = Regex.Match("12.12(324)", @"^[+-]?\d+.\d*\(\d+\)$");
             Console.WriteLine(m.Success);
+            r1 = RationalNumber.Parse("3.021(8512)", CultureInfo.InvariantCulture);
+            Console.WriteLine("{0:p}", r1);
             Console.ReadKey();
         }
     }

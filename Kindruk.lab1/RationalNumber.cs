@@ -9,7 +9,6 @@ namespace Kindruk.lab1
     {
         public const string DenominatorOutOfRange = "Знаменатель должен быть целым числом.";
         public const string UnknownNumberFormat = "Неизвестный формат представления числа.";
-        public const string WrongNumberFormat = "Число не соответствует указанному формату.";
         public const string FormatProviderNullReference = "formatProvider дал пустую ссылку.";
 
         long _numerator;
@@ -57,7 +56,7 @@ namespace Kindruk.lab1
 
         public RationalNumber(double value)
         {
-            var r = Parse(value.ToString("0.############", CultureInfo.CurrentCulture));
+            var r = Parse(value.ToString("0.###############", CultureInfo.CurrentCulture));
             Numerator = r.Numerator;
             Denominator = r.Denominator;
         }
@@ -87,22 +86,30 @@ namespace Kindruk.lab1
             {
                 r1 = new RationalNumber(long.Parse(c[0]), 1);
                 r2 = new RationalNumber(long.Parse(c[1]), (long)Math.Pow(10, c[1].Length));
-                var r3 = new RationalNumber(long.Parse(c[2]), (long)(Math.Pow(10, c[1].Length)*(Math.Pow(10, c[2].Length+1)-1)));
+                var r3 = new RationalNumber(long.Parse(c[2]), (long)(Math.Pow(10, c[1].Length)*(Math.Pow(10, c[2].Length)-1)));
+                r2.Numerator *= c[0] == "-0" ? -1 : 1;
+                r3.Numerator *= c[0] == "-0" ? -1 : 1;
                 return r1 + r2 + r3;
             }
-            if (str.Contains("/"))
+            if (str.Contains("/") && cnt == 2)
             {
                 return new RationalNumber(long.Parse(c[0]), long.Parse(c[1]));
             }
-            if (str.Contains("("))
+            if (str.Contains("(") && cnt == 2)
             {
                 r1 = new RationalNumber(long.Parse(c[0]), 1);
-                r2 = new RationalNumber(long.Parse(c[1]), (long) Math.Pow(10, c[1].Length + 1) - 1);
+                r2 = new RationalNumber(long.Parse(c[1]), (long) Math.Pow(10, c[1].Length) - 1);
+                r2.Numerator *= c[0] == "-0" ? -1 : 1;
                 return r1 + r2;
             }
-            r1 = new RationalNumber(long.Parse(c[0]), 1);
-            r2 = new RationalNumber(long.Parse(c[1]), (long)Math.Pow(10, c[1].Length));
-            return r1 + r2;
+            if (cnt == 2)
+            {
+                r1 = new RationalNumber(long.Parse(c[0]), 1);
+                r2 = new RationalNumber(long.Parse(c[1]), (long) Math.Pow(10, c[1].Length));
+                r2.Numerator *= c[0] == "-0" ? -1 : 1;
+                return r1 + r2;
+            }
+            return new RationalNumber(long.Parse(c[0]), 1);
         }
 
         public static bool TryParse(string str)
@@ -117,7 +124,7 @@ namespace Kindruk.lab1
                 return true;
             var cultureInfo = formatProvider as CultureInfo;
             if (cultureInfo == null)
-                throw new FormatException(FormatProviderNullReference);
+                throw new NullReferenceException(FormatProviderNullReference);
             match = Regex.Match(str, cultureInfo.NumberFormat.NumberDecimalSeparator == "." ? @"^[+-]?\d+.\d*\(\d+\)$" : @"^[+-]?\d+,\d*\(\d+\)$");
             if (match.Success)
                 return true;
@@ -146,27 +153,62 @@ namespace Kindruk.lab1
                 formatProvider = CultureInfo.CurrentCulture;
             var cultureInfo = formatProvider as CultureInfo;
             if (cultureInfo == null)
-                throw new FormatException(FormatProviderNullReference);
-            long wholePart;
-            double fractionalPart;
-            StringBuilder sb;
+                throw new NullReferenceException(FormatProviderNullReference);
             switch (format.ToUpperInvariant())
             {
                 case "F":
                     return Numerator.ToString(formatProvider)+"/"+Denominator.ToString(formatProvider);
                 case "R":
-                    wholePart = Numerator/Denominator;
-                    fractionalPart = Numerator%Denominator;
-                    fractionalPart = fractionalPart/Denominator;
-                    sb = new StringBuilder(fractionalPart.ToString(formatProvider));
-                    sb.Remove(0, 2);
-                    return wholePart.ToString(formatProvider) + cultureInfo.NumberFormat.NumberDecimalSeparator +sb;
+                    return ToRealNumber(cultureInfo, formatProvider);
                 case "P":
-                    //Not implemented
-                    return Numerator.ToString(formatProvider) + "/" + Denominator.ToString(formatProvider);
+                    return ToPeriodicNumber(cultureInfo, formatProvider);
                 default:
                     throw new FormatException(UnknownNumberFormat);
             }
+        }
+
+        private string ToRealNumber(CultureInfo cultureInfo, IFormatProvider formatProvider)
+        {
+            var wholePart = Numerator / Denominator;
+            double fractionalPart = Numerator % Denominator;
+            fractionalPart = fractionalPart / Denominator;
+            var sb = new StringBuilder(fractionalPart.ToString("0.###############", formatProvider));
+            sb.Remove(0, Numerator < 0 ? 3 : 2);
+            return (Numerator < 0 ? "-" : "") + wholePart.ToString(formatProvider) + cultureInfo.NumberFormat.NumberDecimalSeparator + sb;
+        }
+
+        private string ToPeriodicNumber(CultureInfo cultureInfo, IFormatProvider formatProvider)
+        {
+            var wholePart = Numerator / Denominator;
+            var fractionalPart = Numerator % Denominator;
+            var sb = new StringBuilder(wholePart.ToString(formatProvider));
+            sb.Append(cultureInfo.NumberFormat.NumberDecimalSeparator);
+            var nonFractionalPart = sb.Length;
+            while (fractionalPart > 0)
+            {
+                fractionalPart *= 10;
+                sb.Append((fractionalPart/Denominator).ToString(formatProvider));
+                fractionalPart %= Denominator;
+                for (var i = 1; i <= (sb.Length - nonFractionalPart)/2; i++)
+                {
+                    var period = i;
+                    for (var j = sb.Length; j > sb.Length - i; j--)
+                        if (sb[j - 1] != sb[j - i - 1])
+                        {
+                            period = 0;
+                            break;
+                        }
+                    if (period != 0)
+                    {
+                        sb.Remove(sb.Length - period, period);
+                        sb.Insert(sb.Length - period, '(');
+                        sb.Append(')');
+                        fractionalPart = 0;
+                        break;
+                    }
+                }
+            }
+            return sb.ToString();
         }
 
         #region overloaded math operations
