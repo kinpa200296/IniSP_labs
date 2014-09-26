@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace Kindruk.lab1
 {
-    public class RationalNumber : IFormattable
+    public class RationalNumber : IEquatable<RationalNumber>, IComparable<RationalNumber>, IFormattable
     {
         public const string DenominatorOutOfRange = "Знаменатель должен быть целым числом.";
         public const string UnknownNumberFormat = "Неизвестный формат представления числа.";
@@ -217,6 +217,70 @@ namespace Kindruk.lab1
         public static RationalNumber Abs(RationalNumber p)
         {
             return new RationalNumber(Math.Abs(p.Numerator), p.Denominator);
+        }
+
+        #endregion
+
+        public bool Equals(RationalNumber other)
+        {
+            if (ReferenceEquals(other, null))
+                return false;
+            return (Numerator == other.Numerator) && (Denominator == other.Denominator);
+        }
+
+        public int CompareTo(RationalNumber other)
+        {
+            if (ReferenceEquals(other, null))
+                return 1;
+            var val = MathExtension.Lcm(Denominator, other.Denominator);
+            val = Numerator * (val / Denominator) - other.Numerator * (val / other.Denominator);
+            if (val > 0)
+                return 1;
+            if (val < 0)
+                return -1;
+            return 0;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj.GetType() == GetType() && Equals((RationalNumber)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)(((Denominator % 2000000013) * 37 + (Math.Abs(Numerator) % 2000000013) * 13) % 2000000013);
+        }
+
+        #region overloaded comparison operators
+
+        public static bool operator ==(RationalNumber p1, RationalNumber p2)
+        {
+            return !ReferenceEquals(p1, null) ? p1.Equals(p2) : ReferenceEquals(p2, null);
+        }
+
+        public static bool operator !=(RationalNumber p1, RationalNumber p2)
+        {
+            return !(p1 == p2);
+        }
+
+        public static bool operator >(RationalNumber p1, RationalNumber p2)
+        {
+            return p1.CompareTo(p2) > 0;
+        }
+
+        public static bool operator <(RationalNumber p1, RationalNumber p2)
+        {
+            return p1.CompareTo(p2) < 0;
+        }
+
+        public static bool operator >=(RationalNumber p1, RationalNumber p2)
+        {
+            return p1.CompareTo(p2) >= 0;
+        }
+
+        public static bool operator <=(RationalNumber p1, RationalNumber p2)
+        {
+            return p1.CompareTo(p2) <= 0;
         }
 
         #endregion
