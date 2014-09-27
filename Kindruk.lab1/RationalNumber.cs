@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,7 +16,9 @@ namespace Kindruk.lab1
         long _denominator = 1;
 
         #region properties
-
+        /// <summary>
+        /// Числитель рационального числа
+        /// </summary>
         public long Numerator 
         {
             get 
@@ -27,12 +30,14 @@ namespace Kindruk.lab1
             }
             set { _numerator = value; }
         }
-
+        /// <summary>
+        /// Знаменать рационального числа
+        /// </summary>
         public long Denominator 
         {
             get
             {
-                long val = MathExtension.Gcd(Math.Abs(_numerator), _denominator);// общий множитель
+                var val = MathExtension.Gcd(Math.Abs(_numerator), _denominator);// общий множитель
                 _numerator /= val;
                 _denominator /= val;
                 return _denominator; 
@@ -47,13 +52,21 @@ namespace Kindruk.lab1
         #endregion
 
         #region constructors
-
+        /// <summary>
+        /// Возвращает объект RationalNumber с заданными числителем и знаменателем
+        /// </summary>
+        /// <param name="numerator">Числитель рационального числа</param>
+        /// <param name="denominator">Знаменать рационального числа</param>
         public RationalNumber(long numerator, long denominator)
         {
             Numerator = numerator;
             Denominator = denominator;
         }
 
+        /// <summary>
+        /// Возвращает объект RationalNumber соответствующий заданному числу
+        /// </summary>
+        /// <param name="value">Вещественное число</param>
         public RationalNumber(double value)
         {
             var r = Parse(value.ToString("0.###############", CultureInfo.CurrentCulture));
@@ -63,11 +76,24 @@ namespace Kindruk.lab1
 
         #endregion
 
+        /// <summary>
+        /// Преобразует строковое значение, заданное в виде дроби, вещественного числа или числа с периодом
+        /// в объект типа RationalNumber с учетом местных региональных стандартов
+        /// </summary>
+        /// <param name="str">Содержит число в виде дроби, вещественного числа или числа с периодом</param>
+        /// <returns></returns>
         public static RationalNumber Parse(string str)
         {
             return Parse(str, CultureInfo.CurrentCulture);
         }
 
+        /// <summary>
+        /// Преобразует строковое значение, заданное в виде дроби, вещественного числа или числа с периодом
+        /// в объект типа RationalNumber с учетом заданных региональных стандартов
+        /// </summary>
+        /// <param name="str">Содержит число в виде дроби, вещественного числа или числа с периодом</param>
+        /// <param name="formatProvider">Параметр, содержащий региональные стандарты</param>
+        /// <returns></returns>
         public static RationalNumber Parse(string str, IFormatProvider formatProvider)
         {
             if (!TryParse(str, formatProvider))
@@ -79,7 +105,8 @@ namespace Kindruk.lab1
                 {
                     cnt--;
                     if (i != c.Length - 1)
-                        c[i] = c[i + 1];
+                        for (var j = i; j < c.Length-2; j++)
+                            c[j] = c[j + 1];
                 }
             RationalNumber r1, r2;
             if (cnt == 3)
@@ -87,8 +114,8 @@ namespace Kindruk.lab1
                 r1 = new RationalNumber(long.Parse(c[0]), 1);
                 r2 = new RationalNumber(long.Parse(c[1]), (long)Math.Pow(10, c[1].Length));
                 var r3 = new RationalNumber(long.Parse(c[2]), (long)(Math.Pow(10, c[1].Length)*(Math.Pow(10, c[2].Length)-1)));
-                r2.Numerator *= c[0] == "-0" ? -1 : 1;
-                r3.Numerator *= c[0] == "-0" ? -1 : 1;
+                r2.Numerator *= (c[0] == "-0" || r1.Numerator < 0) ? -1 : 1;
+                r3.Numerator *= (c[0] == "-0" || r1.Numerator < 0) ? -1 : 1;
                 return r1 + r2 + r3;
             }
             if (str.Contains("/") && cnt == 2)
@@ -99,24 +126,37 @@ namespace Kindruk.lab1
             {
                 r1 = new RationalNumber(long.Parse(c[0]), 1);
                 r2 = new RationalNumber(long.Parse(c[1]), (long) Math.Pow(10, c[1].Length) - 1);
-                r2.Numerator *= c[0] == "-0" ? -1 : 1;
+                r2.Numerator *= (c[0] == "-0" || r1.Numerator < 0) ? -1 : 1;
                 return r1 + r2;
             }
             if (cnt == 2)
             {
                 r1 = new RationalNumber(long.Parse(c[0]), 1);
                 r2 = new RationalNumber(long.Parse(c[1]), (long) Math.Pow(10, c[1].Length));
-                r2.Numerator *= c[0] == "-0" ? -1 : 1;
+                r2.Numerator *= (c[0] == "-0" || r1.Numerator < 0) ? -1 : 1;
                 return r1 + r2;
             }
             return new RationalNumber(long.Parse(c[0]), 1);
         }
 
+        /// <summary>
+        /// Проверяет возможность преобразования числа
+        /// в объект типа RationalNumber с учетом местных региональных стандартов
+        /// </summary>
+        /// <param name="str">Содержит число в виде дроби, вещественного числа или числа с периодом</param>
+        /// <returns></returns>
         public static bool TryParse(string str)
         {
             return TryParse(str, CultureInfo.CurrentCulture);
         }
-
+        
+        /// <summary>
+        /// Проверяет возможность преобразования числа
+        /// в объект типа RationalNumber с учетом заданных региональных стандартов
+        /// </summary>
+        /// <param name="str">Содержит число в виде дроби, вещественного числа или числа с периодом</param>
+        /// <param name="formatProvider">Параметр, содержащий региональные стандарты</param>
+        /// <returns></returns>
         public static bool TryParse(string str, IFormatProvider formatProvider)
         {
             var match = Regex.Match(str, @"^[+-]?\d+$");
@@ -135,16 +175,42 @@ namespace Kindruk.lab1
             return match.Success;
         }
 
+        /// <summary>
+        /// Возвращает строковое значение соответствующее значения объекта
+        /// в виде дроби с учетом местных региональных стандартов
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return ToString("F", CultureInfo.CurrentCulture);
         }
 
+        /// <summary>
+        /// Возвращает строковое значение соответствующее значения объекта
+        /// с учетом заданных региональных стандартов в заданном формате
+        /// Флаги форматирования:
+        /// F - в виде дроби
+        /// R - в виде вещественного числа
+        /// P - в виде числа с периодом
+        /// </summary>
+        /// <param name="format">Параметр форматирования</param>
+        /// <returns></returns>
         public string ToString(string format)
         {
             return ToString(format, CultureInfo.CurrentCulture);
         }
 
+        /// <summary>
+        /// Возвращает строковое значение соответствующее значения объекта
+        /// с учетом заданных региональных стандартов в заданном формате
+        /// Флаги форматирования:
+        /// F - в виде дроби
+        /// R - в виде вещественного числа
+        /// P - в виде числа с периодом
+        /// </summary>
+        /// <param name="format">Параметр форматирования</param>
+        /// <param name="formatProvider">Параметр, содержащий региональные стандарты</param>
+        /// <returns></returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             if (string.IsNullOrEmpty(format))
@@ -182,31 +248,27 @@ namespace Kindruk.lab1
             var wholePart = Numerator / Denominator;
             var fractionalPart = Numerator % Denominator;
             var sb = new StringBuilder(wholePart.ToString(formatProvider));
+            if (wholePart == 0 && fractionalPart < 0)
+                sb.Insert(0, '-');
             sb.Append(cultureInfo.NumberFormat.NumberDecimalSeparator);
             var nonFractionalPart = sb.Length;
+            fractionalPart = Math.Abs(fractionalPart);
+            var dictionary = new Dictionary<long, long> {{fractionalPart, 1}};
             while (fractionalPart > 0)
             {
                 fractionalPart *= 10;
+                if (dictionary.ContainsKey(fractionalPart))
+                {
+                    long extra;
+                    dictionary.TryGetValue(fractionalPart, out extra);
+                    nonFractionalPart += (int)extra;
+                    sb.Insert(nonFractionalPart, '(');
+                    sb.Append(')');
+                    return sb.ToString();
+                }
+                dictionary.Add(fractionalPart, sb.Length - nonFractionalPart);
                 sb.Append((fractionalPart/Denominator).ToString(formatProvider));
                 fractionalPart %= Denominator;
-                for (var i = 1; i <= (sb.Length - nonFractionalPart)/2; i++)
-                {
-                    var period = i;
-                    for (var j = sb.Length; j > sb.Length - i; j--)
-                        if (sb[j - 1] != sb[j - i - 1])
-                        {
-                            period = 0;
-                            break;
-                        }
-                    if (period != 0)
-                    {
-                        sb.Remove(sb.Length - period, period);
-                        sb.Insert(sb.Length - period, '(');
-                        sb.Append(')');
-                        fractionalPart = 0;
-                        break;
-                    }
-                }
             }
             return sb.ToString();
         }
