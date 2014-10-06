@@ -240,7 +240,7 @@ namespace Kindruk.lab1
             fractionalPart = fractionalPart / Denominator;
             var sb = new StringBuilder(fractionalPart.ToString("0.###############", formatProvider));
             sb.Remove(0, Numerator < 0 ? 3 : 2);
-            return (Numerator < 0 ? "-" : "") + wholePart.ToString(formatProvider) + cultureInfo.NumberFormat.NumberDecimalSeparator + sb;
+            return ((Numerator < 0 && wholePart == 0) ? "-" : "") + wholePart.ToString(formatProvider) + cultureInfo.NumberFormat.NumberDecimalSeparator + sb;
         }
 
         private string ToPeriodicNumber(CultureInfo cultureInfo, IFormatProvider formatProvider)
@@ -251,25 +251,26 @@ namespace Kindruk.lab1
             if (wholePart == 0 && fractionalPart < 0)
                 sb.Insert(0, '-');
             sb.Append(cultureInfo.NumberFormat.NumberDecimalSeparator);
-            var nonFractionalPart = sb.Length;
             fractionalPart = Math.Abs(fractionalPart);
-            var dictionary = new Dictionary<long, long> {{fractionalPart, 1}};
+            var list = new List<long>();
+            var hashset = new HashSet<long>();
             while (fractionalPart > 0)
             {
                 fractionalPart *= 10;
-                if (dictionary.ContainsKey(fractionalPart))
-                {
-                    long extra;
-                    dictionary.TryGetValue(fractionalPart, out extra);
-                    nonFractionalPart += (int)extra;
-                    sb.Insert(nonFractionalPart, '(');
-                    sb.Append(')');
-                    return sb.ToString();
-                }
-                dictionary.Add(fractionalPart, sb.Length - nonFractionalPart);
-                sb.Append((fractionalPart/Denominator).ToString(formatProvider));
+                if (hashset.Contains(fractionalPart))
+                    break;
+                hashset.Add(fractionalPart);
+                list.Add(fractionalPart);
                 fractionalPart %= Denominator;
             }
+            foreach (var item in list)
+            {
+                if (item == fractionalPart)
+                    sb.Append('(');
+                sb.Append((item / Denominator).ToString(formatProvider));
+            }
+            if (hashset.Contains(fractionalPart))
+                sb.Append(')');
             return sb.ToString();
         }
 
