@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>89372815-f5e2-4832-b56c-07bd456aa8f2</ProjectGuid>
+    <ProjectGuid>{5A6FE379-DF96-4965-9142-0DE97BDD82FB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Kindruk.lab2.Tests</RootNamespace>
