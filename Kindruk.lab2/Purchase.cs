@@ -7,10 +7,13 @@ namespace Kindruk.lab2
     class Purchase<T> : IPurchase<T> where T : IMerchandise
     {
         private const int BaseLength = 40;
+        public const string IndexOutOfRange = "Индекс не является допутимым.";
+        public const string TooFewSpace = "Все элементы коллекции не могут помеситься в массив.";
 
         private int _maxLength = BaseLength;
         private T[] _items = new T[BaseLength];
         private int _count;
+        private bool _disposed;
 
         #region properties
 
@@ -31,6 +34,8 @@ namespace Kindruk.lab2
             {
                 if (value > MaxLength)
                     MaxLength *= 2;
+                if (value < MaxLength/2)
+                    MaxLength /= 2;
                 _count = value;
             }
         }
@@ -44,15 +49,15 @@ namespace Kindruk.lab2
         {
             get
             {
-                if (index < Count && index > 0)
+                if (index < Count && index >= 0)
                     return _items[index];
-                throw new IndexOutOfRangeException();
+                throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
             }
             set
             {
-                if (index < Count && index > 0)
+                if (index < Count && index >= 0)
                     _items[index] = value;
-                throw new IndexOutOfRangeException();
+                throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
             }
         }
 
@@ -62,14 +67,32 @@ namespace Kindruk.lab2
         {
             private readonly T[] _data;
             private int _currentPosition;
+            private bool _disposed;
 
             public PurchaseEnumerator(T[] values)
             {
                 _data = new T[values.Length];
                 values.CopyTo(_data, 0);
             }
-            
-            public void Dispose(){}
+
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
+                Dispose(true);
+            }
+
+            private void Dispose(bool disposing)
+            {
+                if (_disposed) return;
+                if (disposing)
+                {
+                    foreach (var item in _data)
+                    {
+                        item.Dispose();
+                    }
+                }
+                _disposed = true;
+            }
 
             public bool MoveNext()
             {
@@ -105,47 +128,105 @@ namespace Kindruk.lab2
 
         public void Add(T item)
         {
-            throw new NotImplementedException();
+            if (IsReadOnly)
+                throw new NotSupportedException();
+            Count++;
+            _items[Count - 1] = item;
         }
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            if (IsReadOnly)
+                throw new NotSupportedException();
+            _items = new T[BaseLength];
         }
 
         public bool Contains(T item)
         {
-            throw new NotImplementedException();
+            for (var i = 0; i < Count; i++)
+                if (_items[i].Equals(item))
+                    return true;
+            return false;
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            if (arrayIndex >= Count || arrayIndex < 0)
+                throw new ArgumentOutOfRangeException("arrayIndex", IndexOutOfRange);
+            if (array == null)
+                throw new ArgumentNullException("array");
+            if (array.Length - arrayIndex < Count)
+                throw new ArgumentException(TooFewSpace, "array");
+            for (var i = 0; i < Count; i++)
+                array[arrayIndex + i] = _items[i];
         }
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            if (IsReadOnly)
+                throw new NotSupportedException();
+            for (var i = 0; i < Count; i++)
+                if (_items[i].Equals(item))
+                {
+                    RemoveAt(i);
+                    return true;
+                }
+            return false;
         }
 
         public int IndexOf(T item)
         {
-            throw new NotImplementedException();
+            for (var i = 0; i < Count; i++)
+                if (_items[i].Equals(item))
+                    return i;
+            return -1;
         }
 
         public void Insert(int index, T item)
         {
-            throw new NotImplementedException();
+            if (IsReadOnly)
+                throw new NotSupportedException();
+            if (index > Count || index < 0)
+                throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
+            Count++;
+            for (var i = index; i < Count - 1; i++)
+                _items[i + 1] = _items[i];
+            _items[index] = item;
         }
 
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            if (IsReadOnly)
+                throw new NotSupportedException();
+            if (index >= Count || index < 0)
+                throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
+            for (var i = index; i < Count; i++)
+                _items[i] = _items[i - 1];
+            Count--;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            GC.SuppressFinalize(this);
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+            {
+                foreach (var item in _items)
+                {
+                    item.Dispose();
+                }
+            }
+            _disposed = true;
+        }
+
+        ~Purchase()
+        {
+            Dispose(false);
         }
     }
 }

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kindruk.lab2
 {
-    interface IMerchandise
+    interface IMerchandise : IDisposable, IEquatable<Merchandise>
     {
         string Name { get; set; }
         double Price { get; set; }

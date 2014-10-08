@@ -11,6 +11,7 @@ namespace Kindruk.lab2
         private string _name;
         private double _price;
         private int _count;
+        private bool _disposed;
 
         #region properties
         public string Name
@@ -63,5 +64,58 @@ namespace Kindruk.lab2
             Count = count;
         }
         #endregion
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing){}
+            _disposed = true;
+        }
+
+        public bool Equals(Merchandise other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(_name, other._name) && _price.Equals(other._price) && _count == other._count;
+        }
+
+        public static bool operator ==(Merchandise p1, Merchandise p2)
+        {
+            return !ReferenceEquals(p1, null) ? p1.Equals(p2) : ReferenceEquals(p2, null);
+        }
+
+        public static bool operator !=(Merchandise p1, Merchandise p2)
+        {
+            return !(p1 == p2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj.GetType() == GetType() && Equals((Merchandise)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (Name != null ? Name.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ Price.GetHashCode();
+                hashCode = (hashCode * 397) ^ Count;
+                return hashCode;
+            }
+        }
+
+        ~Merchandise()
+        {
+            Dispose(false);
+        }
     }
 }
