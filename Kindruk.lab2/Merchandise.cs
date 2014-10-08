@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Kindruk.lab2
 {
-    class Merchandise : IMerchandise
+    public class Merchandise : IMerchandise
     {
         public const string NameCannotBeNull = "Имя товара не может быть пустым указателем, пустой строкой или строкой содержащей только пробелы";
         public const string PriceOutOfRange = "Цена товара - положительное число, большее нуля";
         public const string CountOutOfRange = "Количество товаров - натуральное число";
+        public const string FormatProviderNullReference = "formatProvider дал пустую ссылку.";
+        public const string UnknownFormat = "Неизвестный формат представления покупки.";
 
         private string _name;
         private double _price;
@@ -65,6 +68,11 @@ namespace Kindruk.lab2
         }
         #endregion
 
+        public double Cost()
+        {
+            return Count*Price;
+        }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -116,6 +124,36 @@ namespace Kindruk.lab2
         ~Merchandise()
         {
             Dispose(false);
+        }
+
+        public override string ToString()
+        {
+            return ToString("S", CultureInfo.CurrentCulture);
+        }
+
+        public string ToString(string format)
+        {
+            return ToString(format, CultureInfo.CurrentCulture);
+        }
+
+        public string ToString(string format, IFormatProvider formatProvider)
+        {
+            if (string.IsNullOrEmpty(format))
+                format = "S";
+            if (formatProvider == null)
+                formatProvider = CultureInfo.CurrentCulture;
+            var cultureInfo = formatProvider as CultureInfo;
+            if (cultureInfo == null)
+                throw new NullReferenceException(FormatProviderNullReference);
+            switch (format.ToUpperInvariant())
+            {
+                case "S":
+                    return Name + "    " + Cost().ToString("0.####", formatProvider);
+                case "F":
+                    return Name + "    " + Count.ToString(formatProvider) + "    " + Price.ToString("0.####", formatProvider);
+                default:
+                    throw new FormatException(UnknownFormat);
+            }
         }
     }
 }

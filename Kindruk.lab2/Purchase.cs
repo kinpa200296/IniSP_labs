@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Kindruk.lab2
 {
-    class Purchase<T> : IPurchase<T> where T : IMerchandise
+    public class Purchase<T> : IPurchase<T> where T : IMerchandise
     {
         private const int BaseLength = 40;
         public const string IndexOutOfRange = "Индекс не является допутимым.";
@@ -34,8 +35,6 @@ namespace Kindruk.lab2
             {
                 if (value > MaxLength)
                     MaxLength *= 2;
-                if (value < MaxLength/2)
-                    MaxLength /= 2;
                 _count = value;
             }
         }
@@ -66,13 +65,14 @@ namespace Kindruk.lab2
         private class PurchaseEnumerator : IEnumerator<T>
         {
             private readonly T[] _data;
-            private int _currentPosition;
+            private int _currentPosition = -1;
             private bool _disposed;
 
-            public PurchaseEnumerator(T[] values)
+            public PurchaseEnumerator(T[] values, int count)
             {
-                _data = new T[values.Length];
-                values.CopyTo(_data, 0);
+                _data = new T[count];
+                for (var i = 0; i < count; i++)
+                    _data[i] = values[i];
             }
 
             public void Dispose()
@@ -118,7 +118,7 @@ namespace Kindruk.lab2
 
         public IEnumerator<T> GetEnumerator()
         {
-            return new PurchaseEnumerator(_items);
+            return new PurchaseEnumerator(_items, Count);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -155,10 +155,10 @@ namespace Kindruk.lab2
                 throw new ArgumentOutOfRangeException("arrayIndex", IndexOutOfRange);
             if (array == null)
                 throw new ArgumentNullException("array");
-            if (array.Length - arrayIndex < Count)
-                throw new ArgumentException(TooFewSpace, "array");
-            for (var i = 0; i < Count; i++)
-                array[arrayIndex + i] = _items[i];
+            if (array.Length < Count - arrayIndex)
+                throw new ArgumentException(TooFewSpace);
+            for (var i = arrayIndex; i < Count; i++)
+                array[i - arrayIndex] = _items[i];
         }
 
         public bool Remove(T item)
@@ -227,6 +227,11 @@ namespace Kindruk.lab2
         ~Purchase()
         {
             Dispose(false);
+        }
+
+        public double TotalCost()
+        {
+            return this.Sum(item => item.Cost());
         }
     }
 }
