@@ -126,16 +126,38 @@ namespace Kindruk.lab2
             Dispose(false);
         }
 
+        /// <summary>
+        /// Выводит информацию о покупке в формате:
+        /// наименование    общая стоимость
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return ToString("S", CultureInfo.CurrentCulture);
         }
 
+        /// <summary>
+        /// Выводит информацию о покупке в заданном формате.
+        /// Флаги форматирования:
+        /// S - наименование    общая стоимость
+        /// F - наименование    количество единиц    стоимость одной единицы
+        /// </summary>
+        /// <param name="format">Формат представления покупки</param>
+        /// <returns></returns>
         public string ToString(string format)
         {
             return ToString(format, CultureInfo.CurrentCulture);
         }
 
+        /// <summary>
+        /// Выводит информацию о покупке в заданном формате.
+        /// Флаги форматирования:
+        /// S - наименование    общая стоимость
+        /// F - наименование    количество единиц    стоимость одной единицы
+        /// </summary>
+        /// <param name="format">Формат представления покупки</param>
+        /// <param name="formatProvider">Параметр, содержащий региональные стандарты</param>
+        /// <returns></returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             if (string.IsNullOrEmpty(format))

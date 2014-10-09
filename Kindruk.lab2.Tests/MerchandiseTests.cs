@@ -12,7 +12,7 @@ namespace Kindruk.lab2.Tests
         {
             var p1 = new Merchandise("dishwasher", 1050.99);
             var p2 = new Merchandise("towel", 12.99, 4);
-            Assert.AreEqual(false, p1 == null);
+            Assert.AreEqual(false, p1 == p2);
             Assert.AreEqual(false, p2.Equals(new Merchandise("towel", 12.99)));
             Assert.AreEqual(true, p2.Equals(new Merchandise("towel", 12.99, 4)));
             Assert.AreEqual(true, p1 != p2);
@@ -37,7 +37,7 @@ namespace Kindruk.lab2.Tests
         }
 
         [TestMethod]
-        public void PropertiesTest()
+        public void PropertiesExceptionsTest()
         {
             Merchandise a;
             try

@@ -139,6 +139,8 @@ namespace Kindruk.lab2
             if (IsReadOnly)
                 throw new NotSupportedException();
             _items = new T[BaseLength];
+            _maxLength = BaseLength;
+            Count = 0;
         }
 
         public bool Contains(T item)
@@ -200,8 +202,8 @@ namespace Kindruk.lab2
                 throw new NotSupportedException();
             if (index >= Count || index < 0)
                 throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
-            for (var i = index; i < Count; i++)
-                _items[i] = _items[i - 1];
+            for (var i = index; i < Count - 1; i++)
+                _items[i] = _items[i + 1];
             Count--;
         }
 
@@ -216,9 +218,9 @@ namespace Kindruk.lab2
             if (_disposed) return;
             if (disposing)
             {
-                foreach (var item in _items)
+                for (var i = 0; i < Count; i++)
                 {
-                    item.Dispose();
+                    _items[i].Dispose();
                 }
             }
             _disposed = true;
