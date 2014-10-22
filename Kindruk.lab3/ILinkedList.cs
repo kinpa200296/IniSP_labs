@@ -12,6 +12,7 @@ namespace Kindruk.lab3
         bool IsReadOnly { get; }
 
         void AddAfter(LinkedListNode<T> item, T data);
+        void Add(T data);
         void AddFirst(T data);
         void Delete(LinkedListNode<T> item);
         int IndexOf(T item);

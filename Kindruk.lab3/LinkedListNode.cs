@@ -2,7 +2,7 @@
 
 namespace Kindruk.lab3
 {
-    class LinkedListNode<T> : IDisposable where T : IDisposable
+    public class LinkedListNode<T> : IDisposable where T : IDisposable
     {
         public const string NullData = "Получена пустая ссылка на данные для элемента списка.";
         private T _data;
@@ -10,6 +10,12 @@ namespace Kindruk.lab3
         private bool _disposed;
 
         #region constructors
+
+        public LinkedListNode()
+        {
+            _data = default(T);
+        }
+
         public LinkedListNode(T data)
         {
             Data = data;

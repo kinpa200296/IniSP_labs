@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Kindruk.lab3
 {
-    class LinkedList<T> : ILinkedList<T> where T : class, IDisposable, IEquatable<T>
+    public class LinkedList<T> : ILinkedList<T> where T : class, IDisposable, IEquatable<T>
     {
-        private readonly LinkedListNode<T> _emptyElement = new LinkedListNode<T>(null);
+        private readonly LinkedListNode<T> _emptyElement = new LinkedListNode<T>();
         private int _count;
         private bool _disposed;
         public const string ThereIsNoSuchArgument = "Такого элемента нет в списке.";
@@ -16,6 +16,7 @@ namespace Kindruk.lab3
         public const string IndexTooBig = "Индекс не должен превышать размер списка.";
         public const string ArgumentNull = "Аргумент является пустой ссылкой.";
 
+        #region constructors
         public LinkedList()
         {
             Last = _emptyElement;
@@ -29,7 +30,9 @@ namespace Kindruk.lab3
                 AddAfter(Last, item);
             }
         }
+        #endregion
 
+        #region properties
         public LinkedListNode<T> First
         {
             get { return _emptyElement.Next; }
@@ -80,6 +83,7 @@ namespace Kindruk.lab3
                 }
             }
         }
+        #endregion
 
         private class LinkedListEnumerator : IEnumerator<T>
         {
@@ -91,7 +95,7 @@ namespace Kindruk.lab3
             public LinkedListEnumerator(LinkedList<T> list)
             {
                 _list = list;
-                _currentelement = _list.First;
+                _currentelement = _list._emptyElement;
             }
 
             public void Dispose() { }
@@ -104,7 +108,7 @@ namespace Kindruk.lab3
 
             public void Reset()
             {
-                _currentelement = _list.First;
+                _currentelement = _list._emptyElement;
             }
 
             object IEnumerator.Current
@@ -125,12 +129,19 @@ namespace Kindruk.lab3
 
         public void AddAfter(LinkedListNode<T> item, T data)
         {
+            if (ReferenceEquals(item, null))
+                throw new ArgumentException(ThereIsNoSuchArgument);
             var element = new LinkedListNode<T>(data) {Next = item.Next, Previous = item};
             item.Next = element;
-            element.Next.Previous = element;
-            Count++;
             if (ReferenceEquals(item, Last))
                 Last = element;
+            else element.Next.Previous = element;
+            Count++;
+        }
+
+        public void Add(T data)
+        {
+            AddAfter(Last, data);
         }
 
         public void AddFirst(T data)
@@ -144,8 +155,8 @@ namespace Kindruk.lab3
                 throw new ArgumentException(ThereIsNoSuchArgument);
             if (ReferenceEquals(Last, item))
                 Last = item.Previous;
+            else item.Next.Previous = item.Previous;
             item.Previous.Next = item.Next;
-            item.Next.Previous = item.Previous;
             item.Dispose();
             Count--;
         }
@@ -155,7 +166,7 @@ namespace Kindruk.lab3
             var i = 0;
             foreach (var node in this)
             {
-                if (node == item)
+                if (node.Equals(item))
                     return i;
                 i++;
             }
@@ -170,6 +181,7 @@ namespace Kindruk.lab3
             }
             Last = _emptyElement;
             _emptyElement.Next = _emptyElement.Previous = null;
+            Count = 0;
         }
 
         public bool Contains(T item)
@@ -179,7 +191,7 @@ namespace Kindruk.lab3
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null)
+            if (ReferenceEquals(array, null))
                 throw new ArgumentNullException("array", ArgumentNull);
             if (arrayIndex < 0)
                 throw new ArgumentOutOfRangeException("arrayIndex", IndexOutOfRange);
@@ -196,9 +208,9 @@ namespace Kindruk.lab3
         {
             if (IndexOf(data) == -1)
                 throw new ArgumentException(ThereIsNoSuchArgument);
-            for (var node = First.Next; node != null; node = node.Next)
+            for (var node = First; node != null; node = node.Next)
             {
-                if (data == node.Data)
+                if (data.Equals(node.Data))
                     return node;
             }
             return null;
