@@ -6,7 +6,7 @@ namespace Kindruk.lab3
 {
     public class Quiz : ILinkedList<Question>, IStreamable
     {
-        private readonly LinkedList<Question> _questions = new LinkedList<Question>();
+        private readonly ILinkedList<Question> _questions = new LinkedList<Question>();
         private bool _disposed;
 
         #region constructors
@@ -30,12 +30,12 @@ namespace Kindruk.lab3
         #region properties
         public string Name { get; set; }
 
-        public LinkedListNode<Question> First
+        public ILinkedListNode<Question> First
         {
             get { return _questions.First; }
         }
 
-        public LinkedListNode<Question> Last
+        public ILinkedListNode<Question> Last
         {
             get { return _questions.Last; }
         }
@@ -84,7 +84,7 @@ namespace Kindruk.lab3
             _disposed = true;
         }
 
-        public void AddAfter(LinkedListNode<Question> item, Question data)
+        public void AddAfter(ILinkedListNode<Question> item, Question data)
         {
             _questions.AddAfter(item, data);
         }
@@ -99,7 +99,7 @@ namespace Kindruk.lab3
             _questions.AddFirst(data);
         }
 
-        public void Delete(LinkedListNode<Question> item)
+        public void Delete(ILinkedListNode<Question> item)
         {
             _questions.Delete(item);
         }
@@ -124,12 +124,12 @@ namespace Kindruk.lab3
             _questions.CopyTo(array, arrayIndex);
         }
 
-        public LinkedListNode<Question> GetNodeByData(Question data)
+        public ILinkedListNode<Question> GetNodeByData(Question data)
         {
             return _questions.GetNodeByData(data);
         }
 
-        public LinkedListNode<Question> GetNodeByIndex(int index)
+        public ILinkedListNode<Question> GetNodeByIndex(int index)
         {
             return _questions.GetNodeByIndex(index);
         }
@@ -139,7 +139,7 @@ namespace Kindruk.lab3
             Dispose(false);
         }
 
-        public void WriteBinaryToStream(Stream stream)
+        public void WriteToBinaryStream(Stream stream)
         {
             var bw = new BinaryWriter(stream);
             bw.Write(Name);
@@ -147,11 +147,11 @@ namespace Kindruk.lab3
             bw.Flush();
             foreach (var question in this)
             {
-                question.WriteBinaryToStream(stream);
+                question.WriteToBinaryStream(stream);
             }
         }
 
-        public void ReadBinaryFromStream(Stream stream)
+        public void ReadFromBinaryStream(Stream stream)
         {
             var br = new BinaryReader(stream);
             Name = br.ReadString();
@@ -159,7 +159,7 @@ namespace Kindruk.lab3
             for (var i = 0; i < count; i++)
             {
                 var question = new Question();
-                question.ReadBinaryFromStream(stream);
+                question.ReadFromBinaryStream(stream);
                 _questions.Add(question);
             }
         }

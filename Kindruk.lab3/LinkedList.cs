@@ -6,15 +6,10 @@ namespace Kindruk.lab3
 {
     public class LinkedList<T> : ILinkedList<T> where T : class, IDisposable, IEquatable<T>
     {
-        private readonly LinkedListNode<T> _emptyElement = new LinkedListNode<T>();
+        private readonly ILinkedListNode<T> _emptyElement = new LinkedListNode<T>();
         private int _count;
         private bool _disposed;
-        public const string ThereIsNoSuchArgument = "Такого элемента нет в списке.";
-        public const string CountOutOfRangeMessage = "Количество элементов в списке не может быть отрицательным.";
-        public const string ArrayTooSmall = "Все элементы коллекции не могут поместиться в массив.";
-        public const string IndexOutOfRange = "Индекс должен быть целым числом, большим нуля.";
-        public const string IndexTooBig = "Индекс не должен превышать размер списка.";
-        public const string ArgumentNull = "Аргумент является пустой ссылкой.";
+        
 
         #region constructors
         public LinkedList()
@@ -33,12 +28,12 @@ namespace Kindruk.lab3
         #endregion
 
         #region properties
-        public LinkedListNode<T> First
+        public ILinkedListNode<T> First
         {
             get { return _emptyElement.Next; }
         }
 
-        public LinkedListNode<T> Last { get; private set; }
+        public ILinkedListNode<T> Last { get; private set; }
 
         public int Count
         {
@@ -46,7 +41,7 @@ namespace Kindruk.lab3
             private set
             {
                 if (value < 0)
-                    throw new ArgumentOutOfRangeException("value", CountOutOfRangeMessage);
+                    throw new ArgumentOutOfRangeException("value");
                 _count = value;
             }
         }
@@ -58,9 +53,9 @@ namespace Kindruk.lab3
             get
             {
                 if (index < 0)
-                    throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
+                    throw new ArgumentOutOfRangeException("index");
                 if (index >= Count)
-                    throw new ArgumentOutOfRangeException("index", IndexTooBig);
+                    throw new ArgumentOutOfRangeException("index");
                 foreach (var item in this)
                 {
                     if (index == 0)
@@ -72,9 +67,9 @@ namespace Kindruk.lab3
             set
             {
                 if (index < 0)
-                    throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
+                    throw new ArgumentOutOfRangeException("index");
                 if (index >= Count)
-                    throw new ArgumentOutOfRangeException("index", IndexTooBig);
+                    throw new ArgumentOutOfRangeException("index");
                 for (var node = First; node != null; node = node.Next)
                 {
                     if (index == 0)
@@ -88,7 +83,7 @@ namespace Kindruk.lab3
         private class LinkedListEnumerator : IEnumerator<T>
         {
             private readonly LinkedList<T> _list;
-            private LinkedListNode<T> _currentelement;
+            private ILinkedListNode<T> _currentelement;
 
             public T Current { get { return _currentelement.Data; } }
 
@@ -127,10 +122,10 @@ namespace Kindruk.lab3
             return GetEnumerator();
         }
 
-        public void AddAfter(LinkedListNode<T> item, T data)
+        public void AddAfter(ILinkedListNode<T> item, T data)
         {
             if (IndexOf(item.Data) == -1 && item != _emptyElement)
-                throw new ArgumentException(ThereIsNoSuchArgument);
+                throw new ArgumentException();
             var element = new LinkedListNode<T>(data) {Next = item.Next, Previous = item};
             item.Next = element;
             if (ReferenceEquals(item, Last))
@@ -149,10 +144,10 @@ namespace Kindruk.lab3
             AddAfter(_emptyElement, data);
         }
 
-        public void Delete(LinkedListNode<T> item)
+        public void Delete(ILinkedListNode<T> item)
         {
             if (IndexOf(item.Data) == -1)
-                throw new ArgumentException(ThereIsNoSuchArgument);
+                throw new ArgumentException();
             if (ReferenceEquals(Last, item))
                 Last = item.Previous;
             else item.Next.Previous = item.Previous;
@@ -192,11 +187,11 @@ namespace Kindruk.lab3
         public void CopyTo(T[] array, int arrayIndex)
         {
             if (ReferenceEquals(array, null))
-                throw new ArgumentNullException("array", ArgumentNull);
+                throw new ArgumentNullException("array");
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException("arrayIndex", IndexOutOfRange);
+                throw new ArgumentOutOfRangeException("arrayIndex");
             if (array.Length - arrayIndex < Count)
-                throw new ArgumentException(ArrayTooSmall);
+                throw new ArgumentException();
             foreach (var item in this)
             {
                 array[arrayIndex] = item;
@@ -204,10 +199,10 @@ namespace Kindruk.lab3
             }
         }
 
-        public LinkedListNode<T> GetNodeByData(T data)
+        public ILinkedListNode<T> GetNodeByData(T data)
         {
             if (IndexOf(data) == -1)
-                throw new ArgumentException(ThereIsNoSuchArgument);
+                throw new ArgumentException();
             for (var node = First; node != null; node = node.Next)
             {
                 if (data.Equals(node.Data))
@@ -216,7 +211,7 @@ namespace Kindruk.lab3
             return null;
         }
 
-        public LinkedListNode<T> GetNodeByIndex(int index)
+        public ILinkedListNode<T> GetNodeByIndex(int index)
         {
             return GetNodeByData(this[index]);
         }

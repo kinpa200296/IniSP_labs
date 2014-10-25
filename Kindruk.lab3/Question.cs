@@ -8,7 +8,7 @@ namespace Kindruk.lab3
 {
     public class Question : ILinkedList<Answer>, IEquatable<Question>, IStreamable
     {
-        private readonly LinkedList<Answer> _answers = new LinkedList<Answer>();
+        private readonly ILinkedList<Answer> _answers = new LinkedList<Answer>();
         private bool _disposed;
 
         #region constructors
@@ -45,12 +45,12 @@ namespace Kindruk.lab3
             }
         }
 
-        public LinkedListNode<Answer> First
+        public ILinkedListNode<Answer> First
         {
             get { return _answers.First; }
         }
 
-        public LinkedListNode<Answer> Last
+        public ILinkedListNode<Answer> Last
         {
             get { return _answers.Last; } 
         }
@@ -102,7 +102,7 @@ namespace Kindruk.lab3
             _disposed = true;
         }
 
-        public void AddAfter(LinkedListNode<Answer> item, Answer data)
+        public void AddAfter(ILinkedListNode<Answer> item, Answer data)
         {
             _answers.AddAfter(item, data);
         }
@@ -117,7 +117,7 @@ namespace Kindruk.lab3
             _answers.AddFirst(data);
         }
 
-        public void Delete(LinkedListNode<Answer> item)
+        public void Delete(ILinkedListNode<Answer> item)
         {
             _answers.Delete(item);
         }
@@ -142,12 +142,12 @@ namespace Kindruk.lab3
             _answers.CopyTo(array, arrayIndex);
         }
 
-        public LinkedListNode<Answer> GetNodeByData(Answer data)
+        public ILinkedListNode<Answer> GetNodeByData(Answer data)
         {
             return _answers.GetNodeByData(data);
         }
 
-        public LinkedListNode<Answer> GetNodeByIndex(int index)
+        public ILinkedListNode<Answer> GetNodeByIndex(int index)
         {
             return _answers.GetNodeByIndex(index);
         }
@@ -165,7 +165,7 @@ namespace Kindruk.lab3
             Dispose(false);
         }
 
-        public void WriteBinaryToStream(Stream stream)
+        public void WriteToBinaryStream(Stream stream)
         {
             var bw = new BinaryWriter(stream);
             bw.Write(Text);
@@ -174,11 +174,11 @@ namespace Kindruk.lab3
             bw.Flush();
             foreach (var answer in this)
             {
-                answer.WriteBinaryToStream(stream);
+                answer.WriteToBinaryStream(stream);
             }
         }
 
-        public void ReadBinaryFromStream(Stream stream)
+        public void ReadFromBinaryStream(Stream stream)
         {
             var br = new BinaryReader(stream);
             Text = br.ReadString();
@@ -187,7 +187,7 @@ namespace Kindruk.lab3
             for (var i = 0; i < count; i++)
             {
                 var answer = new Answer();
-                answer.ReadBinaryFromStream(stream);
+                answer.ReadFromBinaryStream(stream);
                 _answers.Add(answer);
             }
         }

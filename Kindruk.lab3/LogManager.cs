@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Kindruk.lab3
 {
-    public class LogManager
+    public class LogManager : IDisposable
     {
         private readonly FileStream _file;
         public readonly StreamWriter LogFile;
@@ -12,11 +12,14 @@ namespace Kindruk.lab3
         private FileSystemWatcher _watcher;
         private readonly string _logFileName;
 
+        private bool _disposed;
+
         public LogManager(string logfilename = "CurrentLog.txt")
         {
             _file = new FileStream(logfilename, FileMode.Create);
             LogFile = new StreamWriter(_file);
             _logFileName = logfilename;
+            BeginLog();
         }
 
         public void BeginLog()
@@ -55,6 +58,26 @@ namespace Kindruk.lab3
                 System.Threading.Thread.Sleep(1000);
                 File.Move(dir.FullName + "\\" + _logFileName, dir.FullName + @"\logs\log_" + DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + ".txt");
             }
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+            if (disposing) { }
+            EndLog();
+            _disposed = true;
+        }
+
+        ~LogManager()
+        {
+            Dispose(false);
         }
     }
 }

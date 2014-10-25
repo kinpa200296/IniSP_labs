@@ -2,11 +2,9 @@
 
 namespace Kindruk.lab3
 {
-    public class LinkedListNode<T> : IDisposable where T : IDisposable
+    public class LinkedListNode<T> : ILinkedListNode<T> where T : IDisposable
     {
-        public const string NullData = "Получена пустая ссылка на данные для элемента списка.";
         private T _data;
-        private LinkedListNode<T> _previous, _next;
         private bool _disposed;
 
         #region constructors
@@ -29,22 +27,15 @@ namespace Kindruk.lab3
             set
             {
                 if (ReferenceEquals(value, null))
-                    throw new ArgumentNullException("Da" + "ta", NullData);
+                    throw new ArgumentNullException();
                 _data = value;
             }
         }
 
-        public LinkedListNode<T> Previous
-        {
-            get { return _previous; }
-            set { _previous = value; }
-        }
+        public ILinkedListNode<T> Previous { get; set; }
 
-        public LinkedListNode<T> Next
-        {
-            get { return _next; }
-            set { _next = value; } 
-        }
+        public ILinkedListNode<T> Next { get; set; }
+
         #endregion
 
         public void Dispose()

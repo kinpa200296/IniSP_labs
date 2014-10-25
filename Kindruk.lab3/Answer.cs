@@ -66,14 +66,14 @@ namespace Kindruk.lab3
             Dispose(false);
         }
 
-        public void WriteBinaryToStream(Stream stream)
+        public void WriteToBinaryStream(Stream stream)
         {
             var bw = new BinaryWriter(stream);
             bw.Write(Text);
             bw.Flush();
         }
 
-        public void ReadBinaryFromStream(Stream stream)
+        public void ReadFromBinaryStream(Stream stream)
         {
             var br = new BinaryReader(stream);
             Text = br.ReadString();
