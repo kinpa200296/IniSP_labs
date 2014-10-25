@@ -1,8 +1,9 @@
 ﻿using System;
+using System.IO;
 
 namespace Kindruk.lab3
 {
-    public class Answer : IDisposable, IEquatable<Answer>
+    public class Answer : IDisposable, IEquatable<Answer>, IStreamable
     {
         private bool _disposed;
 
@@ -63,6 +64,31 @@ namespace Kindruk.lab3
         ~Answer()
         {
             Dispose(false);
+        }
+
+        public void WriteBinaryToStream(Stream stream)
+        {
+            var bw = new BinaryWriter(stream);
+            bw.Write(Text);
+            bw.Flush();
+        }
+
+        public void ReadBinaryFromStream(Stream stream)
+        {
+            var br = new BinaryReader(stream);
+            Text = br.ReadString();
+        }
+
+        public void WriteToStream(Stream stream)
+        {
+            var sw = new StreamWriter(stream);
+            sw.WriteLine(Text);
+            sw.Flush();
+        }
+
+        public void ReadFromStream(StreamReader stream)
+        {
+            Text = stream.ReadLine();
         }
     }
 }

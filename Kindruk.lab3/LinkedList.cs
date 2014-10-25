@@ -75,7 +75,7 @@ namespace Kindruk.lab3
                     throw new ArgumentOutOfRangeException("index", IndexOutOfRange);
                 if (index >= Count)
                     throw new ArgumentOutOfRangeException("index", IndexTooBig);
-                for (var node = First.Next; node != null; node = node.Next)
+                for (var node = First; node != null; node = node.Next)
                 {
                     if (index == 0)
                         node.Data = value;
@@ -129,7 +129,7 @@ namespace Kindruk.lab3
 
         public void AddAfter(LinkedListNode<T> item, T data)
         {
-            if (ReferenceEquals(item, null))
+            if (IndexOf(item.Data) == -1 && item != _emptyElement)
                 throw new ArgumentException(ThereIsNoSuchArgument);
             var element = new LinkedListNode<T>(data) {Next = item.Next, Previous = item};
             item.Next = element;

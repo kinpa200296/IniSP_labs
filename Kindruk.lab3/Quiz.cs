@@ -1,13 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Kindruk.lab3
 {
-    class Quiz : ILinkedList<Question>
+    public class Quiz : ILinkedList<Question>, IStreamable
     {
-        private LinkedList<Question> _questions = new LinkedList<Question>();
+        private readonly LinkedList<Question> _questions = new LinkedList<Question>();
         private bool _disposed;
 
+        #region constructors
+        public Quiz()
+        {
+            Name = "<quiz is untitled>";
+        }
+
+        public Quiz(string name)
+        {
+            Name = name;
+        }
+
+        public Quiz(string name, IEnumerable<Question> questions)
+        {
+            Name = name;
+            _questions = new LinkedList<Question>(questions);
+        }
+        #endregion
+
+        #region properties
         public string Name { get; set; }
 
         public LinkedListNode<Question> First
@@ -34,6 +54,7 @@ namespace Kindruk.lab3
         {
             get { return false; }
         }
+        #endregion
 
         public IEnumerator<Question> GetEnumerator()
         {
@@ -116,6 +137,55 @@ namespace Kindruk.lab3
         ~Quiz()
         {
             Dispose(false);
+        }
+
+        public void WriteBinaryToStream(Stream stream)
+        {
+            var bw = new BinaryWriter(stream);
+            bw.Write(Name);
+            bw.Write(Count);
+            bw.Flush();
+            foreach (var question in this)
+            {
+                question.WriteBinaryToStream(stream);
+            }
+        }
+
+        public void ReadBinaryFromStream(Stream stream)
+        {
+            var br = new BinaryReader(stream);
+            Name = br.ReadString();
+            var count = br.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var question = new Question();
+                question.ReadBinaryFromStream(stream);
+                _questions.Add(question);
+            }
+        }
+
+        public void WriteToStream(Stream stream)
+        {
+            var sw = new StreamWriter(stream);
+            sw.WriteLine(Name);
+            sw.WriteLine(Count);
+            sw.Flush();
+            foreach (var question in this)
+            {
+                question.WriteToStream(stream);
+            }
+        }
+
+        public void ReadFromStream(StreamReader stream)
+        {
+            Name = stream.ReadLine();
+            var count = int.Parse(stream.ReadLine());
+            for (var i = 0; i < count; i++)
+            {
+                var question = new Question();
+                question.ReadFromStream(stream);
+                _questions.Add(question);
+            }
         }
     }
 }

@@ -1,16 +1,49 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Kindruk.lab3
 {
-    class Question : ILinkedList<Answer>, IEquatable<Question>
+    public class Question : ILinkedList<Answer>, IEquatable<Question>, IStreamable
     {
-        private LinkedList<Answer> _answers = new LinkedList<Answer>();
+        private readonly LinkedList<Answer> _answers = new LinkedList<Answer>();
         private bool _disposed;
 
+        #region constructors
+        public Question()
+        {
+            Text = "<no question text>";
+            CorrectAnswerPos = 0;
+        }
+
+        public Question(string text, int correctAnswerPos = 0)
+        {
+            Text = text;
+            CorrectAnswerPos = correctAnswerPos;
+        }
+
+        public Question(string text, int correctAnswerPos, IEnumerable<Answer> answers)
+        {
+            Text = text;
+            CorrectAnswerPos = correctAnswerPos;
+            _answers = new LinkedList<Answer>(answers);
+        }
+        #endregion
+
+        #region properties
         public string Text { get; set; }
+
+        public int CorrectAnswerPos { get; private set; }
+
+        public Answer CorrectAnswer
+        {
+            get
+            {
+                return CorrectAnswerPos == -1 ? new Answer("<no correct answer>") : _answers[CorrectAnswerPos];
+            }
+        }
 
         public LinkedListNode<Answer> First
         {
@@ -38,6 +71,7 @@ namespace Kindruk.lab3
         {
             get { return false; }
         }
+        #endregion
 
         public IEnumerator<Answer> GetEnumerator()
         {
@@ -129,6 +163,60 @@ namespace Kindruk.lab3
         ~Question()
         {
             Dispose(false);
+        }
+
+        public void WriteBinaryToStream(Stream stream)
+        {
+            var bw = new BinaryWriter(stream);
+            bw.Write(Text);
+            bw.Write(Count);
+            bw.Write(CorrectAnswerPos);
+            bw.Flush();
+            foreach (var answer in this)
+            {
+                answer.WriteBinaryToStream(stream);
+            }
+        }
+
+        public void ReadBinaryFromStream(Stream stream)
+        {
+            var br = new BinaryReader(stream);
+            Text = br.ReadString();
+            var count = br.ReadInt32();
+            CorrectAnswerPos = br.ReadInt32();
+            for (var i = 0; i < count; i++)
+            {
+                var answer = new Answer();
+                answer.ReadBinaryFromStream(stream);
+                _answers.Add(answer);
+            }
+        }
+
+        public void WriteToStream(Stream stream)
+        {
+            var sw = new StreamWriter(stream);
+            sw.WriteLine(Text);
+            sw.WriteLine(Count);
+            sw.WriteLine(CorrectAnswerPos);
+            sw.Flush();
+            foreach (var answer in this)
+            {
+                answer.WriteToStream(stream);
+            }
+
+        }
+
+        public void ReadFromStream(StreamReader stream)
+        {
+            Text = stream.ReadLine();
+            var count = int.Parse(stream.ReadLine());
+            CorrectAnswerPos = int.Parse(stream.ReadLine());
+            for (var i = 0; i < count; i++)
+            {
+                var answer = new Answer();
+                answer.ReadFromStream(stream);
+                _answers.Add(answer);
+            }
         }
     }
 }

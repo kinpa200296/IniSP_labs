@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="LinkedListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadWriteFileTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Kindruk.lab3\Kindruk.lab3.csproj">

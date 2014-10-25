@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Kindruk.lab3.Tests
@@ -89,6 +90,32 @@ namespace Kindruk.lab3.Tests
         }
 
         [TestMethod]
+        public void ExceptionsTests()
+        {
+            var list = new LinkedList<Answer>
+            {
+                new Answer("string"), 
+                new Answer("double"), 
+                new Answer("int") 
+            };
+            try
+            {
+                Console.WriteLine(list[-1]);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+            try
+            {
+                list[2] = new Answer("long");
+                Console.WriteLine(list[3]);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+            }
+        }
+
+        [TestMethod]
         public void LinqTests()
         {
             var list = new LinkedList<Answer> 
@@ -101,6 +128,13 @@ namespace Kindruk.lab3.Tests
             {
                 Assert.AreEqual("int", answer.Text);
             }
+            var temp = from item in list
+                where list.IndexOf(item) > 0
+                select item;
+            var enumerable = temp as Answer[] ?? temp.ToArray();
+            Assert.AreEqual(2, enumerable.Count());
+            Assert.AreEqual(true, enumerable.Contains(new Answer("int")));
+            Assert.AreEqual(true, enumerable.Contains(new Answer("double")));
         }
     }
 }
