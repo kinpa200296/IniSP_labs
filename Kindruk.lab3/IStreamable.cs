@@ -4,8 +4,8 @@ namespace Kindruk.lab3
 {
     public interface IStreamable
     {
-        void WriteBinaryToStream(Stream stream);
-        void ReadBinaryFromStream(Stream stream);
+        void WriteToBinaryStream(Stream stream);
+        void ReadFromBinaryStream(Stream stream);
         void WriteToStream(Stream stream);
         void ReadFromStream(StreamReader stream);
     }

@@ -5,31 +5,31 @@ namespace Kindruk.lab3
 {
     public static class QuizManager
     {
-        public static void WriteBinaryToFile(string filename, Quiz quiz)
+        public static void WriteToBinaryFile(string filename, IStreamable quiz)
         {
             using (var file = new FileStream(filename, FileMode.Create))
             {
                 using (var compressedStream = new GZipStream(file, CompressionMode.Compress))
                 {
-                    quiz.WriteBinaryToStream(compressedStream);
+                    quiz.WriteToBinaryStream(compressedStream);
                 }
             }
         }
 
-        public static Quiz ReadBinaryFromFile(string filename)
+        public static Quiz ReadFromBinaryFile(string filename)
         {
             var quiz = new Quiz();
             using (var file = new FileStream(filename, FileMode.Open))
             {
                 using (var compressedStream = new GZipStream(file, CompressionMode.Decompress))
                 {
-                    quiz.ReadBinaryFromStream(compressedStream);
+                    quiz.ReadFromBinaryStream(compressedStream);
                 }
             }
             return quiz;
         }
 
-        public static void WriteToFile(string filename, Quiz quiz)
+        public static void WriteToFile(string filename, IStreamable quiz)
         {
             using (var file = new FileStream(filename, FileMode.Create))
             {

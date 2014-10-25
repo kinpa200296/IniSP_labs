@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Answer.cs" />
     <Compile Include="ILinkedList.cs" />
+    <Compile Include="ILinkedListNode.cs" />
     <Compile Include="IStreamable.cs" />
     <Compile Include="LinkedList.cs" />
     <Compile Include="LinkedListNode.cs" />
