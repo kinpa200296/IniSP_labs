@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kindruk.lab3", "Kindruk.lab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kindruk.lab3.Tests", "Kindruk.lab3.Tests\Kindruk.lab3.Tests.csproj", "{F08A2011-0F08-4112-9040-8E0A96366D7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kindruk.lab4", "Kindruk.lab4\Kindruk.lab4.csproj", "{860D2263-27E8-4A30-9251-292975AD29DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kindruk.lab4.Tests", "Kindruk.lab4.Tests\Kindruk.lab4.Tests.csproj", "{1F5545F8-4EDD-4AFA-9563-0E83739B2B17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +47,14 @@ Global
 		{F08A2011-0F08-4112-9040-8E0A96366D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F08A2011-0F08-4112-9040-8E0A96366D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F08A2011-0F08-4112-9040-8E0A96366D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{860D2263-27E8-4A30-9251-292975AD29DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{860D2263-27E8-4A30-9251-292975AD29DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{860D2263-27E8-4A30-9251-292975AD29DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{860D2263-27E8-4A30-9251-292975AD29DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F5545F8-4EDD-4AFA-9563-0E83739B2B17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F5545F8-4EDD-4AFA-9563-0E83739B2B17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F5545F8-4EDD-4AFA-9563-0E83739B2B17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F5545F8-4EDD-4AFA-9563-0E83739B2B17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
