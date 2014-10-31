@@ -1,5 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
+using System.Text;
+using System.Xml;
 
 namespace Kindruk.lab4
 {
@@ -51,6 +54,29 @@ namespace Kindruk.lab4
                 }
             }
             return quiz;
+        }
+
+        public static Quiz ReadFromXmlFile(string filename)
+        {
+            var quiz = new Quiz();
+            var settings = new XmlReaderSettings {IgnoreComments = true, IgnoreProcessingInstructions = true};
+            using (var reader = XmlReader.Create(filename, settings))
+            {
+                reader.Read();
+                quiz.ReadFromXmlReader(reader);
+            }
+            return quiz;
+        }
+
+        public static void WriteToXmlFile(string filename, IXmlWritable quiz)
+        {
+            var settings = new XmlWriterSettings {CloseOutput = true, Encoding = Encoding.GetEncoding("utf-8"), Indent = true};
+            using (var writer = XmlWriter.Create(filename, settings))
+            {
+                writer.WriteStartDocument(true);
+                quiz.WriteToXmlWriter(writer);
+                writer.WriteEndDocument();
+            }
         }
     }
 }

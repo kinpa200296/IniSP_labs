@@ -45,6 +45,7 @@
     <Compile Include="ILinkedList.cs" />
     <Compile Include="ILinkedListNode.cs" />
     <Compile Include="IStreamable.cs" />
+    <Compile Include="IXmlWritable.cs" />
     <Compile Include="LinkedList.cs" />
     <Compile Include="LinkedListNode.cs" />
     <Compile Include="LogManager.cs" />

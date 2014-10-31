@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Kindruk.lab4
 {
-    public class Quiz : ILinkedList<Question>, IStreamable
+    public class Quiz : ILinkedList<Question>, IStreamable, IXmlWritable
     {
         private readonly ILinkedList<Question> _questions = new LinkedList<Question>();
         private bool _disposed;
@@ -185,6 +189,115 @@ namespace Kindruk.lab4
                 var question = new Question();
                 question.ReadFromStream(stream);
                 _questions.Add(question);
+            }
+        }
+
+        public void ReadFromXmlDocumnent(XDocument document)
+        {
+            ReadFromXmlElement(document.Root);
+        }
+
+        public XDocument WriteToXmlDocument()
+        {
+            return new XDocument(new XDeclaration("1.0", "utf-8", "yes"), WriteToXmlElement());
+        }
+
+        public void ReadFromXmlElement(XElement element)
+        {
+            if (element.Name != "Quiz")
+                throw new XmlException();
+            Name = element.Element("Name").Value;
+            _questions.Clear();
+            var xQuestions = element.Element("Questions").Elements();
+            foreach (var xQuestion in xQuestions)
+            {
+                var question = new Question();
+                question.ReadFromXmlElement(xQuestion);
+                _questions.Add(question);
+            }
+        }
+
+        public XElement WriteToXmlElement()
+        {
+            return new XElement("Quiz", new XAttribute("Questions_Count", _questions.Count),
+                new XElement("Name", Name),
+                    new XElement("Questions",
+                        from question in _questions
+                            select question.WriteToXmlElement()));
+        }
+
+        public void WriteToXmlWriter(XmlWriter writer)
+        {
+            writer.WriteStartElement("Quiz");
+            writer.WriteAttributeString("Questions_Count", _questions.Count.ToString(CultureInfo.InvariantCulture));
+            writer.WriteElementString("Name", Name);
+            writer.WriteStartElement("Questions");
+            foreach (var question in _questions)
+            {
+                question.WriteToXmlWriter(writer);
+            }
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXmlReader(XmlReader reader)
+        {
+            while (reader.Read())
+            {
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Attribute:
+                        switch (reader.Name)
+                        {
+                            case "Questions_Count":
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "Quiz":
+                            case "Name":
+                                break;
+                            case "Questions":
+                                _questions.Clear();
+                                reader.Read();
+                                while (reader.Name != "Questions")
+                                {
+                                    var ans = new Question();
+                                    ans.ReadFromXmlReader(reader);
+                                    _questions.Add(ans);
+                                    reader.Read();
+                                    if (reader.NodeType == XmlNodeType.Whitespace)
+                                        reader.Read();
+                                }
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.EndElement:
+                        switch (reader.Name)
+                        {
+                            case "Quiz":
+                                return;
+                            case "Name":
+                            case "Questions":
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.Text:
+                        Name = reader.Value;
+                        break;
+                    case XmlNodeType.Whitespace:
+                        break;
+                    default:
+                        throw new XmlException();
+                }
             }
         }
     }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Kindruk.lab4
 {
-    public class Answer : IDisposable, IEquatable<Answer>, IStreamable
+    public class Answer : IDisposable, IEquatable<Answer>, IStreamable, IXmlWritable
     {
         private bool _disposed;
 
@@ -89,6 +91,58 @@ namespace Kindruk.lab4
         public void ReadFromStream(StreamReader stream)
         {
             Text = stream.ReadLine();
+        }
+
+        public void ReadFromXmlDocumnent(XDocument document)
+        {
+            ReadFromXmlElement(document.Root);
+        }
+
+        public XDocument WriteToXmlDocument()
+        {
+            return new XDocument(new XDeclaration("1.0", "utf-8", "yes"), WriteToXmlElement());
+        }
+
+        public void ReadFromXmlElement(XElement element)
+        {
+            if (element.Name != "Answer")
+                throw new XmlException();
+            Text = element.Value;
+        }
+
+        public XElement WriteToXmlElement()
+        {
+            return new XElement("Answer", Text);
+        }
+
+        public void WriteToXmlWriter(XmlWriter writer)
+        {
+            writer.WriteElementString("Answer", Text);
+        }
+
+        public void ReadFromXmlReader(XmlReader reader)
+        {
+            while (reader.Read())
+            {
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name != "Answer")
+                            throw new XmlException();
+                        break;
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "Answer")
+                            throw new XmlException();
+                        return;
+                    case XmlNodeType.Text:
+                        Text = reader.Value;
+                        break;
+                    case XmlNodeType.Whitespace:
+                        break;
+                    default:
+                        throw new XmlException();
+                }
+            }
         }
     }
 }

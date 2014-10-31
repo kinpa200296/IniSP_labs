@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Kindruk.lab4
 {
-    public class Question : ILinkedList<Answer>, IEquatable<Question>, IStreamable
+    public class Question : ILinkedList<Answer>, IEquatable<Question>, IStreamable, IXmlWritable
     {
         private readonly ILinkedList<Answer> _answers = new LinkedList<Answer>();
         private bool _disposed;
@@ -216,6 +219,120 @@ namespace Kindruk.lab4
                 var answer = new Answer();
                 answer.ReadFromStream(stream);
                 _answers.Add(answer);
+            }
+        }
+
+        public void ReadFromXmlDocumnent(XDocument document)
+        {
+            ReadFromXmlElement(document.Root);
+        }
+
+        public XDocument WriteToXmlDocument()
+        {
+            return new XDocument(new XDeclaration("1.0", "utf-8", "yes"), WriteToXmlElement());
+        }
+
+        public void ReadFromXmlElement(XElement element)
+        {
+            if (element.Name != "Question")
+                throw new XmlException();
+            CorrectAnswerPos = int.Parse(element.Attribute("Correct_Answer").Value);
+            Text = element.Element("Text").Value;
+            _answers.Clear();
+            var xAnswers = element.Element("Answers").Elements();
+            foreach (var xAnswer in xAnswers)
+            {
+                var answer = new Answer();
+                answer.ReadFromXmlElement(xAnswer);
+                _answers.Add(answer);
+            }
+        }
+
+        public XElement WriteToXmlElement()
+        {
+            return new XElement("Question", new XAttribute("Answers_Count", _answers.Count), 
+                new XAttribute("Correct_Answer", CorrectAnswerPos), new XElement("Text", Text),
+                    new XElement("Answers",
+                        from answer in _answers
+                            select answer.WriteToXmlElement()));
+        }
+
+        public void WriteToXmlWriter(XmlWriter writer)
+        {
+            writer.WriteStartElement("Question");
+            writer.WriteAttributeString("Answers_Count", _answers.Count.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString("Correct_Answer", CorrectAnswerPos.ToString(CultureInfo.InvariantCulture));
+            writer.WriteElementString("Text", Text);
+            writer.WriteStartElement("Answers");
+            foreach (var answer in _answers)
+            {
+                answer.WriteToXmlWriter(writer);
+            }
+            writer.WriteEndElement();
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXmlReader(XmlReader reader)
+        {
+            while (reader.Read())
+            {
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Attribute:
+                        switch (reader.Name)
+                        {
+                            case "Answers_Count":
+                                break;
+                            case "Correct_Answer":
+                                CorrectAnswerPos = int.Parse(reader.Value);
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "Question":
+                            case "Text":
+                                break;
+                            case "Answers":
+                                _answers.Clear();
+                                reader.Read();
+                                while (reader.Name != "Answers")
+                                {
+                                    var ans = new Answer();
+                                    ans.ReadFromXmlReader(reader);
+                                    _answers.Add(ans);
+                                    reader.Read();
+                                    if (reader.NodeType == XmlNodeType.Whitespace)
+                                        reader.Read();
+                                }
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.EndElement:
+                        switch (reader.Name)
+                        {
+                            case "Question":
+                                return;
+                            case "Text":
+                            case "Answers":
+                                break;
+                            default:
+                                throw new XmlException();
+                        }
+                        break;
+                    case XmlNodeType.Text:
+                        Text = reader.Value;
+                        break;
+                    case XmlNodeType.Whitespace:
+                        break;
+                    default:
+                        throw new XmlException();
+                }
             }
         }
     }
