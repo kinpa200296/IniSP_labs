@@ -3,7 +3,6 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace Kindruk.lab4
 {
@@ -12,11 +11,9 @@ namespace Kindruk.lab4
     public class Answer : IDisposable, IEquatable<Answer>, IStreamable, IXmlWritable
     {
         [NonSerialized]
-        [XmlIgnore]
         private bool _disposed;
 
         [DataMember(Name = "Text")]
-        [XmlText]
         public string Text { get; set; }
 
         [OnDeserialized]

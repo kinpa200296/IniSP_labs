@@ -1,12 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Xml;
-using System.Xml.Serialization;
 
 namespace Kindruk.lab4
 {
@@ -98,24 +95,6 @@ namespace Kindruk.lab4
             using (Stream file = File.OpenRead(filename))
             {
                 return (Quiz) ds.ReadObject(file);
-            }
-        }
-
-        public static void WriteToXmlViaXmlSerializer(string filename, Quiz quiz)
-        {
-            var serializer = new XmlSerializer(typeof (Quiz));
-            using (Stream file = File.Create(filename))
-            {
-                serializer.Serialize(file, quiz);
-            }
-        }
-
-        public static Quiz ReadFromXmlViaXmlSerializer(string filename)
-        {
-            var serializer = new XmlSerializer(typeof(Quiz));
-            using (Stream file = File.OpenRead(filename))
-            {
-                return (Quiz)serializer.Deserialize(file);
             }
         }
     }

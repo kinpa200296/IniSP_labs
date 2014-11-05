@@ -36,14 +36,5 @@ namespace Kindruk.lab4.Tests
             var quiz2 = QuizManager.ReadFromXmlViaDataContract("C# test 2(DataContract).xml");
             Assert.AreEqual(true, quiz1.SequenceEqual(quiz2));
         }
-
-        [TestMethod]
-        public void XmlSerializerTests()
-        {
-            var quiz1 = QuizManager.ReadFromXmlViaDataContract("C# test 2(DataContract).xml");
-            QuizManager.WriteToXmlViaXmlSerializer("C# test 2(XmlSerializer).xml", quiz1);
-            var quiz2 = QuizManager.ReadFromXmlViaXmlSerializer("C# test 2(XmlSerializer).xml");
-            Assert.AreEqual(true, quiz1.SequenceEqual(quiz2));
-        }
     }
 }
