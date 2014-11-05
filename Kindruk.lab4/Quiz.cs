@@ -1,17 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace Kindruk.lab4
 {
+    [Serializable]
+    [DataContract(Name = "Quiz", Namespace = "bsuir")]
+    [XmlRoot("quiz")]
     public class Quiz : ILinkedList<Question>, IStreamable, IXmlWritable
     {
+        [DataMember(Name = "Questions", Order = 1)]
+        [XmlArray("Questions")]
+        [XmlArrayItem("Question")]
         private readonly ILinkedList<Question> _questions = new LinkedList<Question>();
+
+        [NonSerialized]
+        [XmlIgnore]
         private bool _disposed;
+
+        [OnDeserialized]
+        public void AfterDeserialization(StreamingContext streamingContext)
+        {
+            _disposed = false;
+        }
 
         #region constructors
         public Quiz()
@@ -32,28 +50,36 @@ namespace Kindruk.lab4
         #endregion
 
         #region properties
+        [DataMember(Name = "Name", Order = 0)]
+        [XmlElement("Name")]
         public string Name { get; set; }
 
+        [XmlIgnore]
         public ILinkedListNode<Question> First
         {
             get { return _questions.First; }
         }
 
+        [XmlIgnore]
         public ILinkedListNode<Question> Last
         {
             get { return _questions.Last; }
         }
+
+        [XmlIgnore]
         public int Count 
         {
             get { return _questions.Count; }
         }
 
+        [XmlIgnore]
         public Question this[int index]
         {
             get { return _questions[index]; }
             set { _questions[index] = value; }
         }
 
+        [XmlIgnore]
         public bool IsReadOnly
         {
             get { return false; }

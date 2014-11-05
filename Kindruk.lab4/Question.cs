@@ -4,15 +4,31 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace Kindruk.lab4
 {
+    [Serializable]
+    [DataContract(Name = "Question", Namespace = "bsuir")]
     public class Question : ILinkedList<Answer>, IEquatable<Question>, IStreamable, IXmlWritable
     {
+        [DataMember(Name = "Answers", Order = 2)]
+        [XmlArray("Answers")]
+        [XmlArrayItem("Answer")]
         private readonly ILinkedList<Answer> _answers = new LinkedList<Answer>();
+
+        [NonSerialized]
+        [XmlIgnore]
         private bool _disposed;
+
+        [OnDeserialized]
+        public void AfterDeserialization(StreamingContext streamingContext)
+        {
+            _disposed = false;
+        }
 
         #region constructors
         public Question()
@@ -36,10 +52,15 @@ namespace Kindruk.lab4
         #endregion
 
         #region properties
+        [DataMember(Name = "Text", Order = 0)]
+        [XmlElement("Text")]
         public string Text { get; set; }
 
+        [DataMember(Name = "CorrectAnswerPos", Order = 1)]
+        [XmlAttribute("CorrectAnswerPos")]
         public int CorrectAnswerPos { get; private set; }
 
+        [XmlIgnore]
         public Answer CorrectAnswer
         {
             get
@@ -48,28 +69,33 @@ namespace Kindruk.lab4
             }
         }
 
+        [XmlIgnore]
         public ILinkedListNode<Answer> First
         {
             get { return _answers.First; }
         }
 
+        [XmlIgnore]
         public ILinkedListNode<Answer> Last
         {
             get { return _answers.Last; } 
         }
 
+        [XmlIgnore]
         public int Count
         {
             get { return _answers.Count; }
 
         }
 
+        [XmlIgnore]
         public Answer this[int index]
         {
             get { return _answers[index]; }
             set { _answers[index] = value; }
         }
 
+        [XmlIgnore]
         public bool IsReadOnly
         {
             get { return false; }

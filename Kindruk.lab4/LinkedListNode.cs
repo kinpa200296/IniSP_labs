@@ -1,11 +1,23 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Kindruk.lab4
 {
+    [Serializable]
+    [DataContract(Namespace = "bsuir")]
     public class LinkedListNode<T> : ILinkedListNode<T> where T : IDisposable
     {
+        [DataMember]
         private T _data;
+
+        [NonSerialized]
         private bool _disposed;
+
+        [OnDeserialized]
+        public void AfterDeserialization(StreamingContext streamingContext)
+        {
+            _disposed = false;
+        }
 
         #region constructors
 

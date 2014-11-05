@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Kindruk.lab4
 {
+    [Serializable]
+    [CollectionDataContract(Namespace = "bsuir")]
     public class LinkedList<T> : ILinkedList<T> where T : class, IDisposable, IEquatable<T>
     {
         private readonly ILinkedListNode<T> _emptyElement = new LinkedListNode<T>();
         private int _count;
+
+        [NonSerialized]
         private bool _disposed;
-        
+
+        [OnDeserialized]
+        public void AfterDeserialization(StreamingContext streamingContext)
+        {
+            _disposed = false;
+        }
 
         #region constructors
         public LinkedList()
