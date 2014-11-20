@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,7 +8,7 @@ using GraphIO;
 using Plugin;
 using WeightedGraph;
 
-[assembly: AssemblyVersion("1.0.0.0"), AssemblyTitle("FrameTreeBuilder")]
+[assembly: AssemblyVersion("1.0.0.1"), AssemblyTitle("FrameTreeBuilder")]
 [assembly: AssemblyDescription("Provides methods to build frame tree in unorientied weighted graph.")]
 namespace FrameTreeBuilder
 {
@@ -62,21 +63,30 @@ namespace FrameTreeBuilder
 
         public void DoSomeAction()
         {
-            Console.WriteLine("Filename Please.");
+            Console.WriteLine(ConfigurationManager.ConnectionStrings["FileNameRequest"].ConnectionString);
             var filename = Console.ReadLine();
+            while (!File.Exists(filename))
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["FileNotFound"].ConnectionString);
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["RepeatInput"].ConnectionString);
+                filename = Console.ReadLine();
+            }
             Graph graph;
             using (var file = new FileStream(filename, FileMode.Open))
             {
                 graph = GraphManager.Load(new StreamReader(file));
             }
             if (graph.IsOrientied)
-                throw new FormatException("Graph should be unorientied");
+                throw new FormatException(
+                    ConfigurationManager.ConnectionStrings["UnOrientiedGraphExpected"].ConnectionString);
             var edges = BuildFrameTree(graph);
-            Console.WriteLine("Frame tree weight: {0}", edges.Sum(edge => edge.Weight));
-            Console.WriteLine("Used edges:");
+            Console.WriteLine(ConfigurationManager.ConnectionStrings["FrameTreeWeight"].ConnectionString + "{0}",
+                edges.Sum(edge => edge.Weight));
+            Console.WriteLine(ConfigurationManager.ConnectionStrings["Used Edges"].ConnectionString);
             foreach (var edge in edges)
             {
-                Console.WriteLine("{0} - {1}, weight - {2}", edge.From.Mark, edge.To.Mark, edge.Weight);
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["EdgeOutputFormat"].ConnectionString,
+                    edge.From.Mark, edge.To.Mark, edge.Weight);
             }
         }
     }
