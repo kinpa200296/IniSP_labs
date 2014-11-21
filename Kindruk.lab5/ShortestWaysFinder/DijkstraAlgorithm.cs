@@ -6,7 +6,7 @@ using GraphIO;
 using Plugin;
 using WeightedGraph;
 
-[assembly: AssemblyVersion("1.0.0.1"), AssemblyTitle("ShortestWaysFinder")]
+[assembly: AssemblyVersion("1.0.0.3"), AssemblyTitle("ShortestWaysFinder")]
 [assembly: AssemblyDescription("Provides methods to find the length of the shortest ways from specified node to other nodes.")]
 namespace ShortestWaysFinder
 {
@@ -70,14 +70,16 @@ namespace ShortestWaysFinder
         {
         }
 
+        [PluginMethod("DijkstraAlgorithm", "kinpa200296", "Loads graph from requested file and print into Console distances to all nodes from requested.")]
         public void DoSomeAction()
         {
-            Console.WriteLine(ConfigurationManager.ConnectionStrings["FileNameRequest"].ConnectionString);
+            var strings = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).ConnectionStrings;
+            Console.WriteLine(strings.ConnectionStrings["FileNameRequest"].ConnectionString);
             var filename = Console.ReadLine();
             while (!File.Exists(filename))
             {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["FileNotFound"].ConnectionString);
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["RepeatInput"].ConnectionString);
+                Console.WriteLine(strings.ConnectionStrings["FileNotFound"].ConnectionString);
+                Console.WriteLine(strings.ConnectionStrings["RepeatInput"].ConnectionString);
                 filename = Console.ReadLine();
             }
             Graph graph;
@@ -85,20 +87,20 @@ namespace ShortestWaysFinder
             {
                 graph = GraphManager.Load(new StreamReader(file));
             }
-            Console.WriteLine(ConfigurationManager.ConnectionStrings["NodeMarkRequest"].ConnectionString);
+            Console.WriteLine(strings.ConnectionStrings["NodeMarkRequest"].ConnectionString);
             var s = Console.ReadLine();
             int x;
             while (!int.TryParse(s, out x) || x < 1 || x > graph.NodeCount)
             {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["NodeMarkNotFound"].ConnectionString);
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["RepeatInput"].ConnectionString);
+                Console.WriteLine(strings.ConnectionStrings["NodeMarkNotFound"].ConnectionString);
+                Console.WriteLine(strings.ConnectionStrings["RepeatInput"].ConnectionString);
                 s = Console.ReadLine();
             }
             var distance = DistanceToAllNodesFrom(graph, new Node(x - 1));
-            Console.WriteLine(ConfigurationManager.ConnectionStrings["ShortestWaysFromNode"].ConnectionString + " {0}:", x);
+            Console.WriteLine(strings.ConnectionStrings["ShortestWaysFromNode"].ConnectionString + " {0}:", x);
             for (var i = 0; i < graph.NodeCount; i++)
             {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["ShortestWayOutputFormat"].ConnectionString, x, i,
+                Console.WriteLine(strings.ConnectionStrings["ShortestWayOutputFormat"].ConnectionString, x, i,
                     distance[i]);
             }
         }
