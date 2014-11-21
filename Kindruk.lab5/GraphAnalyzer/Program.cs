@@ -214,7 +214,7 @@ namespace GraphAnalyzer
             }
             Console.Clear();
             var pluginType = Activator.CreateInstance(PluginMethods[key - 1].DeclaringType);
-            PluginMethods[key - 1].Invoke(pluginType, new object[1]);
+            PluginMethods[key - 1].Invoke(pluginType, null);
             Console.WriteLine(ConfigurationManager.ConnectionStrings["PressAnyKey"].ConnectionString);
             Console.ReadKey();
         }

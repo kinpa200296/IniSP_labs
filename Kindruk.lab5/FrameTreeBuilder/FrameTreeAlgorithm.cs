@@ -8,7 +8,7 @@ using GraphIO;
 using Plugin;
 using WeightedGraph;
 
-[assembly: AssemblyVersion("1.0.0.3"), AssemblyTitle("FrameTreeBuilder")]
+[assembly: AssemblyVersion("1.0.0.4"), AssemblyTitle("FrameTreeBuilder")]
 [assembly: AssemblyDescription("Provides methods to build frame tree in unorientied weighted graph.")]
 namespace FrameTreeBuilder
 {
@@ -84,7 +84,7 @@ namespace FrameTreeBuilder
             var edges = BuildFrameTree(graph);
             Console.WriteLine(strings.ConnectionStrings["FrameTreeWeight"].ConnectionString + "{0}",
                 edges.Sum(edge => edge.Weight));
-            Console.WriteLine(strings.ConnectionStrings["Used Edges"].ConnectionString);
+            Console.WriteLine(strings.ConnectionStrings["UsedEdges"].ConnectionString);
             foreach (var edge in edges)
             {
                 Console.WriteLine(strings.ConnectionStrings["EdgeOutputFormat"].ConnectionString,
