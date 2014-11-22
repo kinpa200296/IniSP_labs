@@ -29,7 +29,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphIO", "Kindruk.lab5\Gra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShortestWaysFinder", "Kindruk.lab5\ShortestWaysFinder\ShortestWaysFinder.csproj", "{AFFD36A0-38B2-479C-9131-1774BE48C452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrameTreeBuilder", "Kindruk.lab5\FrameTreeBuilder\FrameTreeBuilder.csproj", "{70295D7C-C344-441E-8F72-D8C03DA593D7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinimumSpanningTreeBuilder", "Kindruk.lab5\MinimumSpanningTreeBuilder\MinimumSpanningTreeBuilder.csproj", "{70295D7C-C344-441E-8F72-D8C03DA593D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

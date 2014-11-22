@@ -16,7 +16,7 @@ namespace GraphAnalyzer
         private static readonly List<MethodInfo> PluginMethods = new List<MethodInfo>();
         private static string _path;
 
-        public static void Init()
+        public static bool Init()
         {
             _path = Directory.GetCurrentDirectory();
             var coreDllsFolder =
@@ -24,115 +24,149 @@ namespace GraphAnalyzer
                                   ConfigurationManager.ConnectionStrings["CoreDllsFolder"].ConnectionString);
             var pluginsFolder =
                 new DirectoryInfo(_path + "\\" + ConfigurationManager.ConnectionStrings["PluginsFolder"].ConnectionString);
-            _coreDllFiles = coreDllsFolder.GetFiles("*.dll");
-            _pluginFiles = pluginsFolder.GetFiles("*.dll");
+            try
+            {
+                _coreDllFiles = coreDllsFolder.GetFiles("*.dll");
+                _pluginFiles = pluginsFolder.GetFiles("*.dll");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["ExceptionOccured"].ConnectionString);
+                Console.WriteLine(e.Message);
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["NoFolder"].ConnectionString,
+                    _coreDllFiles == null ? coreDllsFolder.FullName : pluginsFolder.FullName);
+                return false;
+            }
+            return true;
         }
 
         public static bool LoadCoreDlls()
         {
-            foreach (var file in _coreDllFiles)
+            try
             {
-                CoreDlls.Add(Assembly.LoadFrom(file.FullName));
-            }
-            foreach (var coreDll in CoreDlls)
-            {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["CoreDllCheck"].ConnectionString,
-                    coreDll.GetName().Name);
-                var coreDllAttribute = (CoreDllAttribute)coreDll.GetCustomAttribute(typeof(CoreDllAttribute));
-                var referencedAssemblies = coreDll.GetReferencedAssemblies();
-                var allAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).ToArray();
-                foreach (
-                    var referencedAssembly in
-                        referencedAssemblies.Where(
-                            referencedAssembly =>
-                                allAssemblies.All(assembly => assembly.FullName != referencedAssembly.FullName)))
+                foreach (var file in _coreDllFiles)
                 {
-                    Console.WriteLine(ConfigurationManager.ConnectionStrings["DllMissed"].ConnectionString,
-                        coreDll.GetName().Name, referencedAssembly.FullName);
-                    return false;
+                    CoreDlls.Add(Assembly.LoadFrom(file.FullName));
                 }
-                if (coreDllAttribute != null)
+                foreach (var coreDll in CoreDlls)
                 {
-                    Console.WriteLine(
-                        ConfigurationManager.ConnectionStrings["CoreDllSuccessfullyLoaded"].ConnectionString,
-                        coreDll.GetName().Name, coreDllAttribute.Name);
-                }
-                else
-                {
-                    Console.WriteLine(ConfigurationManager.ConnectionStrings["NotACoreDll"].ConnectionString,
+                    Console.WriteLine(ConfigurationManager.ConnectionStrings["CoreDllCheck"].ConnectionString,
                         coreDll.GetName().Name);
+                    var coreDllAttribute = (CoreDllAttribute) coreDll.GetCustomAttribute(typeof (CoreDllAttribute));
+                    var referencedAssemblies = coreDll.GetReferencedAssemblies();
+                    var allAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).ToArray();
+                    foreach (
+                        var referencedAssembly in
+                            referencedAssemblies.Where(
+                                referencedAssembly =>
+                                    allAssemblies.All(assembly => assembly.FullName != referencedAssembly.FullName)))
+                    {
+                        Console.WriteLine(ConfigurationManager.ConnectionStrings["DllMissed"].ConnectionString,
+                            coreDll.GetName().Name, referencedAssembly.FullName);
+                        return false;
+                    }
+                    if (coreDllAttribute != null)
+                    {
+                        Console.WriteLine(
+                            ConfigurationManager.ConnectionStrings["CoreDllSuccessfullyLoaded"].ConnectionString,
+                            coreDll.GetName().Name, coreDllAttribute.Name);
+                    }
+                    else
+                    {
+                        Console.WriteLine(ConfigurationManager.ConnectionStrings["NotACoreDll"].ConnectionString,
+                            coreDll.GetName().Name);
+                    }
                 }
+                return true;
             }
-            return true;
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["ExceptionOccured"].ConnectionString);
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
 
         public static bool LoadPlugins()
         {
-            foreach (var file in _pluginFiles)
+            try
             {
-                Plugins.Add(Assembly.LoadFrom(file.FullName));
-            }
-            foreach (var plugin in Plugins)
-            {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["PluginCheck"].ConnectionString,
-                    plugin.GetName().Name);
-                var referencedAssemblies = plugin.GetReferencedAssemblies();
-                var allAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).ToArray();
-                foreach (
-                    var referencedAssembly in
-                        referencedAssemblies.Where(
-                            referencedAssembly =>
-                                allAssemblies.All(assembly => assembly.FullName != referencedAssembly.FullName)))
+                foreach (var file in _pluginFiles)
                 {
-                    Console.WriteLine(ConfigurationManager.ConnectionStrings["DllMissed"].ConnectionString,
-                        plugin.GetName().Name, referencedAssembly.FullName);
-                    return false;
+                    Plugins.Add(Assembly.LoadFrom(file.FullName));
                 }
-                var isPlugin = false;
-                foreach (
-                    var type in
-                        plugin.GetTypes()
-                            .Where(
-                                x =>
-                                    x.GetCustomAttributes().Count(a => a.GetType() == typeof (PluginClassAttribute)) ==
-                                    1))
+                foreach (var plugin in Plugins)
                 {
-                    var foundSomething = false;
-                    if (type.GetInterface("Plugin.IPlugin") == typeof (IPlugin))
-                    {
-                        Console.WriteLine(ConfigurationManager.ConnectionStrings["PluginClassFound"].ConnectionString,
-                            type.Name);
-                        PluginTypes.Add(type);
-                        foundSomething = true;
-                        isPlugin = true;
-                    }
+                    Console.WriteLine(ConfigurationManager.ConnectionStrings["PluginCheck"].ConnectionString,
+                        plugin.GetName().Name);
+                    var referencedAssemblies = plugin.GetReferencedAssemblies();
+                    var allAssemblies = AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetName()).ToArray();
                     foreach (
-                        var method in
-                            type.GetMethods()
+                        var referencedAssembly in
+                            referencedAssemblies.Where(
+                                referencedAssembly =>
+                                    allAssemblies.All(assembly => assembly.FullName != referencedAssembly.FullName)))
+                    {
+                        Console.WriteLine(ConfigurationManager.ConnectionStrings["DllMissed"].ConnectionString,
+                            plugin.GetName().Name, referencedAssembly.FullName);
+                        return false;
+                    }
+                    var isPlugin = false;
+                    foreach (
+                        var type in
+                            plugin.GetTypes()
                                 .Where(
                                     x =>
-                                        x.GetCustomAttributes().Count(a => a.GetType() == typeof (PluginMethodAttribute)) ==
+                                        x.GetCustomAttributes().Count(a => a.GetType() == typeof (PluginClassAttribute)) ==
                                         1))
                     {
-                        Console.WriteLine(ConfigurationManager.ConnectionStrings["PluginMethodFound"].ConnectionString,
-                            method.Name, type.Name);
-                        PluginMethods.Add(method);
-                        foundSomething = true;
-                        isPlugin = true;
+                        var foundSomething = false;
+                        if (type.GetInterface("Plugin.IPlugin") == typeof (IPlugin))
+                        {
+                            Console.WriteLine(
+                                ConfigurationManager.ConnectionStrings["PluginClassFound"].ConnectionString,
+                                type.Name);
+                            PluginTypes.Add(type);
+                            foundSomething = true;
+                            isPlugin = true;
+                        }
+                        foreach (
+                            var method in
+                                type.GetMethods()
+                                    .Where(
+                                        x =>
+                                            x.GetCustomAttributes()
+                                                .Count(a => a.GetType() == typeof (PluginMethodAttribute)) ==
+                                            1))
+                        {
+                            Console.WriteLine(
+                                ConfigurationManager.ConnectionStrings["PluginMethodFound"].ConnectionString,
+                                method.Name, type.Name);
+                            PluginMethods.Add(method);
+                            foundSomething = true;
+                            isPlugin = true;
+                        }
+                        if (!foundSomething)
+                        {
+                            Console.WriteLine(
+                                ConfigurationManager.ConnectionStrings["NotAPluginClass"].ConnectionString,
+                                type.Name);
+                        }
                     }
-                    if (!foundSomething)
+                    if (!isPlugin)
                     {
-                        Console.WriteLine(ConfigurationManager.ConnectionStrings["NotAPluginClass"].ConnectionString,
-                            type.Name);
+                        Console.WriteLine(ConfigurationManager.ConnectionStrings["NotAPlugin"].ConnectionString,
+                            plugin.GetName().Name);
                     }
                 }
-                if (!isPlugin)
-                {
-                    Console.WriteLine(ConfigurationManager.ConnectionStrings["NotAPlugin"].ConnectionString,
-                        plugin.GetName().Name);
-                }
+                return true;
             }
-            return true;
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["ExceptionOccured"].ConnectionString);
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
 
         public static void ShowPluginsInfoHandler()
@@ -184,10 +218,19 @@ namespace GraphAnalyzer
                 s = Console.ReadLine();
             }
             Console.Clear();
-            var pluginType = (IPlugin) Activator.CreateInstance(PluginTypes[key - 1]);
-            pluginType.Init();
-            pluginType.DoSomeAction();
-            pluginType.Dispose();
+            try
+            {
+                var pluginType = (IPlugin) Activator.CreateInstance(PluginTypes[key - 1]);
+                pluginType.Init();
+                pluginType.DoSomeAction();
+                pluginType.Dispose();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["ExceptionOccured"].ConnectionString);
+                Console.WriteLine(e.Message);
+            }
+
             Console.WriteLine(ConfigurationManager.ConnectionStrings["PressAnyKey"].ConnectionString);
             Console.ReadKey();
         }
@@ -213,8 +256,16 @@ namespace GraphAnalyzer
                 s = Console.ReadLine();
             }
             Console.Clear();
-            var pluginType = Activator.CreateInstance(PluginMethods[key - 1].DeclaringType);
-            PluginMethods[key - 1].Invoke(pluginType, null);
+            try
+            {
+                var pluginType = Activator.CreateInstance(PluginMethods[key - 1].DeclaringType);
+                PluginMethods[key - 1].Invoke(pluginType, null);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["ExceptionOccured"].ConnectionString);
+                Console.WriteLine(e.Message);
+            }
             Console.WriteLine(ConfigurationManager.ConnectionStrings["PressAnyKey"].ConnectionString);
             Console.ReadKey();
         }
@@ -281,7 +332,12 @@ namespace GraphAnalyzer
 
         public static void Main()
         {
-            Init();
+            if (!Init())
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["FatalError"].ConnectionString);
+                Console.ReadKey();
+                return;
+            }
             if (!LoadCoreDlls())
             {
                 Console.WriteLine(ConfigurationManager.ConnectionStrings["FatalError"].ConnectionString);

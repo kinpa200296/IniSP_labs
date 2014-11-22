@@ -2,10 +2,10 @@
 
 namespace WeightedGraph
 {
-    public interface IEdge : IDisposable
+    public interface IEdge<out T> : IDisposable
     {
         INode From { get; }
         INode To { get; }
-        int Weight { get; }
+        T Weight { get; }
     }
 }

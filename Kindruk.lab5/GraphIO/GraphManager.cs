@@ -4,16 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using WeightedGraph;
-using Plugin;
 
-[assembly: AssemblyTitle("GraphIO"), AssemblyVersion("1.0.0.2")]
-[assembly: AssemblyDescription("Provides methods for saving and loading weighted graphs.")]
-[assembly: CoreDll("GraphIO", "kinpa200296", "Provides methods for saving and loading weighted graphs.")]
 namespace GraphIO
 {
     public static class GraphManager
     {
-        public static Graph Load(StreamReader streamReader)
+        public static Graph<int> Load(StreamReader streamReader)
         {
             var strings = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).ConnectionStrings;
             try
@@ -27,7 +23,7 @@ namespace GraphIO
                 if (s != strings.ConnectionStrings["OrientiedMark"].ConnectionString &&
                     s != strings.ConnectionStrings["NonOrientiedMark"].ConnectionString)
                     throw new Exception(strings.ConnectionStrings["MissingGraphType"].ConnectionString);
-                var graph = new Graph(n, s == strings.ConnectionStrings["OrientiedMark"].ConnectionString);
+                var graph = new Graph<int>(n, s == strings.ConnectionStrings["OrientiedMark"].ConnectionString);
                 for (var i = 0; i < m; i++)
                 {
                     s = streamReader.ReadLine();
@@ -38,7 +34,7 @@ namespace GraphIO
                     var w = int.Parse(c[2]);
                     var nodeX = new Node(x);
                     var nodeY = new Node(y);
-                    var edge = new Edge(nodeX, nodeY, w);
+                    var edge = new Edge<int>(nodeX, nodeY, w);
                     graph.Add(edge);
                 }
 
@@ -52,10 +48,10 @@ namespace GraphIO
 
         }
 
-        public static void Write(StreamWriter streamWriter, Graph graph)
+        public static void Write(StreamWriter streamWriter, Graph<int> graph)
         {
             var strings = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).ConnectionStrings;
-            var edges = graph.GetAllEdges();
+            var edges = graph.GetAllEdges().ToArray();
             streamWriter.WriteLine(
                 strings.ConnectionStrings["NodesEdgesCountOutputFormat"].ConnectionString, graph.NodeCount,
                 edges.Length);

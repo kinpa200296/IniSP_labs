@@ -6,8 +6,6 @@ using GraphIO;
 using Plugin;
 using WeightedGraph;
 
-[assembly: AssemblyVersion("1.0.0.3"), AssemblyTitle("ShortestWaysFinder")]
-[assembly: AssemblyDescription("Provides methods to find the length of the shortest ways from specified node to other nodes.")]
 namespace ShortestWaysFinder
 {
     [PluginClass("ShorestWaysFinder", "DijkstraAlgorithm", "kinpa200296",
@@ -16,7 +14,7 @@ namespace ShortestWaysFinder
     {
         private bool _disposed;
 
-        public int[] DistanceToAllNodesFrom(Graph graph, INode node)
+        public int[] DistanceToAllNodesFrom(Graph<int> graph, INode node)
         {
             var distance = new int[graph.NodeCount];
             var used = new bool[graph.NodeCount];
@@ -82,7 +80,7 @@ namespace ShortestWaysFinder
                 Console.WriteLine(strings.ConnectionStrings["RepeatInput"].ConnectionString);
                 filename = Console.ReadLine();
             }
-            Graph graph;
+            Graph<int> graph;
             using (var file = new FileStream(filename, FileMode.Open))
             {
                 graph = GraphManager.Load(new StreamReader(file));

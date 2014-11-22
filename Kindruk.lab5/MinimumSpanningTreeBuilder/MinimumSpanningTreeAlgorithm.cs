@@ -8,19 +8,17 @@ using GraphIO;
 using Plugin;
 using WeightedGraph;
 
-[assembly: AssemblyVersion("1.0.0.4"), AssemblyTitle("FrameTreeBuilder")]
-[assembly: AssemblyDescription("Provides methods to build frame tree in unorientied weighted graph.")]
-namespace FrameTreeBuilder
+namespace MinimumSpanningTreeBuilder
 {
-    [PluginClass("FrameTreeBuilder", "FrameTreeAlgorithm", "kinpa200296",
-        "Contains methods to build frame tree in unorientied weighted graph")]
-    class FrameTreeAlgorithm : IPlugin
+    [PluginClass("MinimumSpanningTreeBuilder", "MinimumSpanningTreeAlgorithm", "kinpa200296",
+        "Contains methods to build Minimum Spanning Tree in unorientied weighted graph")]
+    class MinimumSpanningTreeAlgorithm : IPlugin
     {
         private bool _disposed;
 
-        public IEdge[] BuildFrameTree(Graph graph)
+        public IEdge<int>[] BuildMinimumSpanningTree(Graph<int> graph)
         {
-            var edges = new List<IEdge>();
+            var edges = new List<IEdge<int>>();
             var sets = new int[graph.NodeCount];
             for (var i = 0; i < graph.NodeCount; i++)
             {
@@ -38,7 +36,7 @@ namespace FrameTreeBuilder
             return edges.ToArray();
         }
 
-        ~FrameTreeAlgorithm()
+        ~MinimumSpanningTreeAlgorithm()
         {
             Dispose(false);
         }
@@ -61,7 +59,7 @@ namespace FrameTreeBuilder
         {
         }
 
-        [PluginMethod("FrameTreeAlgorithm", "kinpa200296", "Loads graph from requested file and print into Console it's Frame Tree.")]
+        [PluginMethod("MinimumSpanningTreeAlgorithm", "kinpa200296", "Loads graph from requested file and print into Console it's Minimum Spanning Tree.")]
         public void DoSomeAction()
         {
             var strings = ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).ConnectionStrings;
@@ -73,7 +71,7 @@ namespace FrameTreeBuilder
                 Console.WriteLine(strings.ConnectionStrings["RepeatInput"].ConnectionString);
                 filename = Console.ReadLine();
             }
-            Graph graph;
+            Graph<int> graph;
             using (var file = new FileStream(filename, FileMode.Open))
             {
                 graph = GraphManager.Load(new StreamReader(file));
@@ -81,7 +79,7 @@ namespace FrameTreeBuilder
             if (graph.IsOrientied)
                 throw new FormatException(
                     strings.ConnectionStrings["UnOrientiedGraphExpected"].ConnectionString);
-            var edges = BuildFrameTree(graph);
+            var edges = BuildMinimumSpanningTree(graph);
             Console.WriteLine(strings.ConnectionStrings["FrameTreeWeight"].ConnectionString + "{0}",
                 edges.Sum(edge => edge.Weight));
             Console.WriteLine(strings.ConnectionStrings["UsedEdges"].ConnectionString);

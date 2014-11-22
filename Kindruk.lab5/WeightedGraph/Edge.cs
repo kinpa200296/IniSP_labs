@@ -2,22 +2,15 @@
 
 namespace WeightedGraph
 {
-    public class Edge : IEdge
+    public class Edge<T> : IEdge<T>
     {
         private bool _disposed;
 
         public INode From { get; private set; }
         public INode To { get; private set; }
-        public int Weight { get; private set; }
+        public T Weight { get; private set; }
 
-        public Edge(INode from, INode to)
-        {
-            From = from;
-            To = to;
-            Weight = 1;
-        }
-
-        public Edge(INode from, INode to, int weight)
+        public Edge(INode from, INode to, T weight)
         {
             From = from;
             To = to;

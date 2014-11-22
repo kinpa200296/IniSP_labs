@@ -1,18 +1,21 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Plugin;
 
 // Управление общими сведениями о сборке осуществляется с помощью 
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
+
+
 [assembly: AssemblyTitle("GraphIO")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Provides methods for saving and loading weighted graphs.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("GraphIO")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
 
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
 // для COM-компонентов.  Если требуется обратиться к типу в этой сборке через 
@@ -32,5 +35,8 @@ using System.Runtime.InteropServices;
 // Можно задать все значения или принять номер построения и номер редакции по умолчанию, 
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.0.3")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+// Дополнителные сведения о сборке
+[assembly: CoreDll("GraphIO", "kinpa200296", "Provides methods for saving and loading weighted graphs.")]

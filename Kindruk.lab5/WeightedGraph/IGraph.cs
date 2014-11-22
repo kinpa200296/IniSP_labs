@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace WeightedGraph
 {
-    public interface IGraph : IDisposable
+    public interface IGraph<T> : IDisposable
     {
         int NodeCount { get; }
         bool IsOrientied { get; }
-        void Add(IEdge edge);
-        void Remove(IEdge edge);
+        void Add(IEdge<T> edge);
+        void Remove(IEdge<T> edge);
         void RemoveAllEdges();
-        IEnumerable<IEdge> GetNodeEdges(INode node);
-        IEdge[] GetAllEdges();
+        IEnumerable<IEdge<T>> GetNodeEdges(INode node);
+        IEnumerable<IEdge<T>> GetAllEdges();
     }
 }
