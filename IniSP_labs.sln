@@ -35,6 +35,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kindruk.lab6", "Kindruk.lab
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsolePlayer", "Kindruk.lab6\ConsolePlayer\ConsolePlayer.csproj", "{EB709C01-4435-4F2F-9942-CACF8ED962C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Audio", "Kindruk.lab6\Audio\Audio.csproj", "{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kindruk.lab6.Tests", "Kindruk.lab6.Tests\Kindruk.lab6.Tests.csproj", "{A28004C4-AF5F-4AB1-AF3F-56D6F29B6034}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +105,14 @@ Global
 		{EB709C01-4435-4F2F-9942-CACF8ED962C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB709C01-4435-4F2F-9942-CACF8ED962C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB709C01-4435-4F2F-9942-CACF8ED962C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A28004C4-AF5F-4AB1-AF3F-56D6F29B6034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A28004C4-AF5F-4AB1-AF3F-56D6F29B6034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A28004C4-AF5F-4AB1-AF3F-56D6F29B6034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A28004C4-AF5F-4AB1-AF3F-56D6F29B6034}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,5 +125,6 @@ Global
 		{AFFD36A0-38B2-479C-9131-1774BE48C452} = {674D8206-0AC5-4FFB-B20D-6D8BA0229B18}
 		{70295D7C-C344-441E-8F72-D8C03DA593D7} = {674D8206-0AC5-4FFB-B20D-6D8BA0229B18}
 		{EB709C01-4435-4F2F-9942-CACF8ED962C9} = {BBEC6B10-15E9-458A-B031-95CA4087BEF5}
+		{28FD77F5-C645-4F15-BBBF-D3AA3D4D9ADC} = {BBEC6B10-15E9-458A-B031-95CA4087BEF5}
 	EndGlobalSection
 EndGlobal

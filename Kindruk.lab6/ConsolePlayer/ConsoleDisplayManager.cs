@@ -193,6 +193,10 @@ namespace ConsolePlayer
                             CursorPosition--;
                         }
                         continue;
+                    case ConsoleKey.Escape:
+                        stringBuilder.Clear();
+                        CursorPosition = 0;
+                        continue;
                 }
                 if (CursorPosition + 1 == ConsoleBufferHeight*ConsoleBufferWidth )
                     continue;
