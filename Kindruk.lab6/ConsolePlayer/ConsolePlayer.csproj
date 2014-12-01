@@ -44,6 +44,9 @@
   <ItemGroup>
     <Compile Include="ConsoleDisplayManager.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PlayerPlayList.cs" />
+    <Compile Include="PlayerSong.cs" />
+    <Compile Include="PlayListsPageViewManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

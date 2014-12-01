@@ -14,7 +14,6 @@ namespace ConsolePlayer
             _consoleBufferHeight = 26,
             _consoleBufferWidth = 80;
 
-        public static TimeSpan RefreshRate { get; private set; }
         public static string CurrentInput { get; private set; }
         public static int CursorPosition { get; private set; }
 
@@ -94,13 +93,17 @@ namespace ConsolePlayer
                         var key = Console.ReadKey(true);
                         keys.Add(key);
                     }
-                    Console.Clear();
                     ProcessKeys(keys, out work);
-                    Console.Write(CurrentInput);
-                    Console.CursorLeft = CursorPosition%ConsoleBufferWidth;
-                    Console.CursorTop = CursorPosition/ConsoleBufferWidth + 1;
                 }
-                Thread.Sleep(RefreshRate);
+                Console.Clear();
+                foreach (var s in PlayListsPageViewManager.GetPageSnapShot())
+                {
+                    Console.WriteLine(s);
+                }
+                Console.Write(CurrentInput);
+                Console.CursorLeft = CursorPosition % ConsoleBufferWidth;
+                Console.CursorTop = CursorPosition/ConsoleBufferWidth + 3*Player.PlayLists.Count;
+                Thread.Sleep(Player.RefreshRate);
             }
         }
 
@@ -108,16 +111,16 @@ namespace ConsolePlayer
         {
             var keys = new[]
             {
-                "RefreshRate", "ConsoleBufferWidth", "ConsoleBufferHeight", "ConsoleWindowWidth", "ConsoleWindowHeight"
+                "ConsoleBufferWidth", "ConsoleBufferHeight", "ConsoleWindowWidth", "ConsoleWindowHeight"
             };
             var values = keys.Select(x => int.Parse(ConfigurationManager.AppSettings[x])).ToArray();
-            RefreshRate = new TimeSpan(0, 0, 0, 0, values[0]);
-            ConsoleBufferWidth = values[1];
-            ConsoleBufferHeight = values[2];
-            ConsoleWindowWidth = values[3];
-            ConsoleWindowHeight = values[4];
+            ConsoleBufferWidth = values[0];
+            ConsoleBufferHeight = values[1];
+            ConsoleWindowWidth = values[2];
+            ConsoleWindowHeight = values[3];
             CurrentInput = "";
             CursorPosition = 0;
+            PlayListsPageViewManager.Init();
         }
 
         static void ProcessKeys(IEnumerable<ConsoleKeyInfo> keys, out bool work)
@@ -161,19 +164,21 @@ namespace ConsolePlayer
                     case ConsoleKey.UpArrow:
                         CursorPosition = CursorPosition > ConsoleBufferWidth
                             ? CursorPosition - ConsoleBufferWidth
-                            : CursorPosition;
+                            : 0;
                         continue;
                     case ConsoleKey.DownArrow:
                         CursorPosition = CursorPosition + ConsoleBufferWidth < stringBuilder.Length
                             ? CursorPosition + ConsoleBufferWidth
-                            : CursorPosition;
+                            : stringBuilder.Length;
                         continue;
                     case ConsoleKey.Home:
                         CursorPosition = (CursorPosition/ConsoleBufferWidth)*ConsoleBufferWidth;
                         continue;
                     case ConsoleKey.Enter:
+                        Player.LoadPlayList(stringBuilder.ToString());
                         stringBuilder.Clear();
                         CursorPosition = 0;
+                        Thread.Sleep(Player.RefreshRate);
                         continue;
                     case ConsoleKey.End:
                         CursorPosition =
