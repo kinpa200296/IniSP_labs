@@ -10,7 +10,8 @@ namespace ConsolePlayer
     {
         private static int _freeSongId, _freePlayListId;
 
-        public static readonly List<PlayerPlayList> PlayLists = new List<PlayerPlayList>(); 
+        public static readonly List<PlayerPlayList> PlayLists = new List<PlayerPlayList>();
+
         public static TimeSpan RefreshRate { get; private set; }
 
         public static void Launch(string[] playlists)

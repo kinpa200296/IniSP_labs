@@ -15,11 +15,14 @@ namespace ConsolePlayer
         public bool Play { get; private set; }
         public bool StayAlive { get; set; }
         public PlayerSong CurrentSong { get { return PlayerSongs[CurrentSongIndex]; } }
+        public ScrollingString Name;
 
         public PlayerPlayList()
         {
             PlayerSongs.Clear();
             Data = new PlayList();
+            Name = new ScrollingString(Data.Name, PlayListsPageViewManager.PlayListNameDisplayStringLength,
+                PlayListsPageViewManager.ScrollingStringSeparator);
             Id = Player.GetNewPlayListId();
             CurrentSongIndex = -1;
             Play = false;
@@ -29,6 +32,8 @@ namespace ConsolePlayer
         {
             PlayerSongs.Clear();
             Data = data;
+            Name = new ScrollingString(Data.Name, PlayListsPageViewManager.PlayListNameDisplayStringLength,
+                PlayListsPageViewManager.ScrollingStringSeparator);
             PlayerSongs.AddRange(Data.Songs.Select(x => new PlayerSong(x)));
             Id = Player.GetNewPlayListId();
             CurrentSongIndex = -1;
@@ -83,7 +88,7 @@ namespace ConsolePlayer
         {
             lock (this)
             {
-                CurrentSongIndex = CurrentSongIndex == PlayerSongs.Count
+                CurrentSongIndex = CurrentSongIndex == PlayerSongs.Count - 1
                         ? 0
                         : CurrentSongIndex + 1;
             }
@@ -94,7 +99,7 @@ namespace ConsolePlayer
             lock (this)
             {
                 CurrentSongIndex = CurrentSongIndex == 0
-                        ? PlayerSongs.Count
+                        ? PlayerSongs.Count - 1
                         : CurrentSongIndex - 1;
             }
         }

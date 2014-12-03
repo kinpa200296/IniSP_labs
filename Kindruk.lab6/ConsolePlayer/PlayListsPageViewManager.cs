@@ -1,12 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 using System.Linq;
 
 namespace ConsolePlayer
 {
     public static class PlayListsPageViewManager
     {
+        public static readonly string ScrollingStringSeparator =
+            ConfigurationManager.ConnectionStrings["ScrollingStringSeparator"].ConnectionString,
+            PlayListsSeparator = ConfigurationManager.ConnectionStrings["PlayListsSeparator"].ConnectionString,
+            PlayListStateStringPlay = ConfigurationManager.ConnectionStrings["PlayListStateStringPlay"].ConnectionString,
+            PlayListStateStringStop = ConfigurationManager.ConnectionStrings["PlayListStateStringStop"].ConnectionString;
+
+        public static int ScrollingStringUpdateFrequency,
+            NameDisplayStringLength,
+            PlayListNameDisplayStringLength,
+            PerformerDisplayStringLength,
+            GenreDisplayStringLength;
+
         public static int PageSize { get; private set; }
 
         public static int FirstPlayListOnPageIndex
@@ -14,7 +27,7 @@ namespace ConsolePlayer
             get { return CurrentPage*PageSize; }
         }
 
-        public static int LastPlayListOnPageIndex
+        public static int FirstPlayListOnNextPageIndex
         {
             get { return Math.Min((CurrentPage + 1)*PageSize, Player.PlayLists.Count); }
         }
@@ -30,10 +43,17 @@ namespace ConsolePlayer
         {
             var keys = new[]
             {
-                "PageSize"
+                "PageSize", "ScrollingStringUpdateFrequency", "NameDisplayStringLength",
+                "PlayListNameDisplayStringLength", "PerformerDisplayStringLength",
+                "GenreDisplayStringLength"
             };
             var values = keys.Select(x => int.Parse(ConfigurationManager.AppSettings[x])).ToArray();
             PageSize = values[0];
+            ScrollingStringUpdateFrequency = values[1];
+            NameDisplayStringLength = values[2];
+            PlayListNameDisplayStringLength = values[3];
+            PerformerDisplayStringLength = values[4];
+            GenreDisplayStringLength = values[5];
         }
 
         public static void NextPage()
@@ -51,11 +71,28 @@ namespace ConsolePlayer
             var strings = new List<string>();
             if (Player.PlayLists.Count == 0)
                 return strings.ToArray();
-            for (var i = FirstPlayListOnPageIndex; i < LastPlayListOnPageIndex; i++)
+            for (var i = FirstPlayListOnPageIndex; i < FirstPlayListOnNextPageIndex; i++)
             {
-                strings.Add(string.Format("{0} [{1}]◙♪{2} - {3}◙♪{4:hh\\:mm\\:ss}/{5:hh\\:mm\\:ss}", Player.PlayLists[i].Data.Name, Player.PlayLists[i].Play ? "Playing" : "Stopped", Player.PlayLists[i].CurrentSong.Data.Performer, Player.PlayLists[i].CurrentSong.Data.Name,
-                    Player.PlayLists[i].CurrentSong.TimePlayed,
-                    Player.PlayLists[i].CurrentSong.Data.Length));
+                strings.Add(
+                    string.Format(
+                        ConfigurationManager.ConnectionStrings["PlayListDisplayFormatString1"].ConnectionString,
+                        Player.PlayLists[i].Name, Player.PlayLists[i].Data.Rating.ToString(CultureInfo.InvariantCulture),
+                        Player.PlayLists[i].Id,
+                        Player.PlayLists[i].Play ? PlayListStateStringPlay : PlayListStateStringStop));
+                strings.Add(
+                    string.Format(
+                        ConfigurationManager.ConnectionStrings["PlayListDisplayFormatString2"].ConnectionString,
+                    Player.PlayLists[i].CurrentSong.Name, Player.PlayLists[i].CurrentSong.Performer,
+                    Player.PlayLists[i].CurrentSong.TimePlayed, Player.PlayLists[i].CurrentSong.Data.Length));
+                strings.Add(
+                    string.Format(
+                        ConfigurationManager.ConnectionStrings["PlayListDisplayFormatString3"].ConnectionString,
+                        Player.PlayLists[i].CurrentSong.Genre, Player.PlayLists[i].CurrentSong.Data.Rating,
+                        Player.PlayLists[i].CurrentSong.Id));
+                if (i != FirstPlayListOnNextPageIndex - 1)
+                {
+                    strings.Add(PlayListsSeparator);
+                }
             }
             return strings.ToArray();
         }

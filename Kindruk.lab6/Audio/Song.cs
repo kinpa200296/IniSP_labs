@@ -24,7 +24,7 @@ namespace Audio
             Name = "<unknown>";
             Length = new TimeSpan(0);
             Performer = "unknown";
-            Genre = Genres.Unknown;
+            Genre = Genres.Other;
             Rating = 0;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -14,8 +15,20 @@ namespace ConsolePlayer
             _consoleBufferHeight = 26,
             _consoleBufferWidth = 80;
 
+        private static ConsoleFrame _playlistsFrame, _logFrame;
+
         public static string CurrentInput { get; private set; }
         public static int CursorPosition { get; private set; }
+        public static int FrameTitleDisplayLength { get; private set; }
+        public static int PlayListsFrameWidth { get; private set; }
+        public static int PlayListsFrameHeight { get; private set; }
+        public static int LogFrameWidth { get; private set; }
+        public static int LogFrameHeight { get; private set; }
+
+        public static readonly string PlayListsFrameTitle =
+            ConfigurationManager.ConnectionStrings["PlayListsFrameTitle"].ConnectionString,
+            LogFrameTitle = ConfigurationManager.ConnectionStrings["LogFrameTitle"].ConnectionString,
+            CommandSeparators = ConfigurationManager.ConnectionStrings["CommandSeparators"].ConnectionString;
 
         public static int ConsoleWindowHeight
         {
@@ -83,6 +96,8 @@ namespace ConsolePlayer
         public static void Run()
         {
             var work = true;
+            _playlistsFrame = new ConsoleFrame(PlayListsFrameTitle, PlayListsFrameWidth, PlayListsFrameHeight);
+            _logFrame = new ConsoleFrame(LogFrameTitle, LogFrameWidth, LogFrameHeight);
             while (work)
             {
                 if (Console.KeyAvailable)
@@ -95,35 +110,56 @@ namespace ConsolePlayer
                     }
                     ProcessKeys(keys, out work);
                 }
-                Console.Clear();
-                foreach (var s in PlayListsPageViewManager.GetPageSnapShot())
-                {
-                    Console.WriteLine(s);
-                }
-                Console.Write(CurrentInput);
-                Console.CursorLeft = CursorPosition % ConsoleBufferWidth;
-                Console.CursorTop = CursorPosition/ConsoleBufferWidth + 3*Player.PlayLists.Count;
+                ReDrawScreen();
                 Thread.Sleep(Player.RefreshRate);
             }
+        }
+
+        public static void ReDrawScreen()
+        {
+            Console.Clear();
+            _playlistsFrame.CurrentPage = PlayListsPageViewManager.CurrentPage + 1;
+            _playlistsFrame.PageCount = PlayListsPageViewManager.PageCount + 1;
+            _playlistsFrame.Build();
+            _playlistsFrame.Fill(PlayListsPageViewManager.GetPageSnapShot());
+            _playlistsFrame.Title.Scroll();
+            Console.Write(_playlistsFrame.Print());
+            //_logFrame.CurrentPage =
+            //_logFrame.PageCount = 
+            _logFrame.Build();
+            //_logFrame.Fill();
+            _logFrame.Title.Scroll();
+            Console.Write(_logFrame.Print());
+            Console.Write(">>> ");
+            Console.Write(CurrentInput);
+            Console.CursorLeft = (CursorPosition + 4)%ConsoleBufferWidth;
+            Console.CursorTop = LogFrameHeight + PlayListsFrameHeight + (CursorPosition + 4)/ConsoleBufferWidth;
         }
 
         public static void Init()
         {
             var keys = new[]
             {
-                "ConsoleBufferWidth", "ConsoleBufferHeight", "ConsoleWindowWidth", "ConsoleWindowHeight"
+                "ConsoleBufferWidth", "ConsoleBufferHeight", "ConsoleWindowWidth", "ConsoleWindowHeight",
+                "FrameTitleDisplayLength", "PlayListsFrameWidth", "PlayListsFrameHeight", "LogFrameWidth",
+                "LogFrameHeight"
             };
             var values = keys.Select(x => int.Parse(ConfigurationManager.AppSettings[x])).ToArray();
             ConsoleBufferWidth = values[0];
             ConsoleBufferHeight = values[1];
             ConsoleWindowWidth = values[2];
             ConsoleWindowHeight = values[3];
+            FrameTitleDisplayLength = values[4];
+            PlayListsFrameWidth = values[5];
+            PlayListsFrameHeight = values[6];
+            LogFrameWidth = values[7];
+            LogFrameHeight = values[8];
             CurrentInput = "";
             CursorPosition = 0;
             PlayListsPageViewManager.Init();
         }
 
-        static void ProcessKeys(IEnumerable<ConsoleKeyInfo> keys, out bool work)
+        public static void ProcessKeys(IEnumerable<ConsoleKeyInfo> keys, out bool work)
         {
             var stringBuilder = new StringBuilder(CurrentInput, CurrentInput.Length);
             foreach (var key in keys)
@@ -140,12 +176,12 @@ namespace ConsolePlayer
                 }
                 if (key.Key == ConsoleKey.LeftArrow && key.Modifiers == ConsoleModifiers.Control)
                 {
-                    Console.WriteLine("PlayListManager.GetPreviousPage");
+                    PlayListsPageViewManager.PreviousPage();
                     continue;
                 }
                 if (key.Key == ConsoleKey.RightArrow && key.Modifiers == ConsoleModifiers.Control)
                 {
-                    Console.WriteLine("PlayListManager.GetNextPage");
+                    PlayListsPageViewManager.NextPage();
                     continue;
                 }
                 if (key.Key == ConsoleKey.Q && key.Modifiers == ConsoleModifiers.Alt)
@@ -175,10 +211,9 @@ namespace ConsolePlayer
                         CursorPosition = (CursorPosition/ConsoleBufferWidth)*ConsoleBufferWidth;
                         continue;
                     case ConsoleKey.Enter:
-                        Player.LoadPlayList(stringBuilder.ToString());
+                        ProcessCommand(stringBuilder.ToString());
                         stringBuilder.Clear();
                         CursorPosition = 0;
-                        Thread.Sleep(Player.RefreshRate);
                         continue;
                     case ConsoleKey.End:
                         CursorPosition =
@@ -211,6 +246,62 @@ namespace ConsolePlayer
             Console.WriteLine();
             CurrentInput = stringBuilder.ToString();
             work = true;
+        }
+
+        public static void ProcessCommand(string command)
+        {
+            var args = command.Split(CommandSeparators.ToCharArray());
+            Commands commandType;
+            if (!Enum.TryParse(args[0], true, out commandType))
+            {
+                commandType = Commands.Unknown;
+            }
+            int id;
+            switch (commandType)
+            {
+                case Commands.Load:
+                    if (File.Exists(args[1]))
+                    {
+                        Player.LoadPlayList(args[1]);
+                        Thread.Sleep(Player.RefreshRate);
+                    }
+                    break;
+                case Commands.Kill:
+                    if (int.TryParse(args[1], out id))
+                    {
+                        var playList = Player.PlayLists.Find(x => x.Id == id);
+                        playList.StayAlive = false;
+                        Player.PlayLists.Remove(playList);
+                    }
+                    break;
+                case Commands.Next:
+                    if (int.TryParse(args[1], out id))
+                    {
+                        Player.PlayLists.Find(x => x.Id == id).NextSong();
+                    }
+                    break;
+                case Commands.Prev:
+                    if (int.TryParse(args[1], out id))
+                    {
+                        Player.PlayLists.Find(x => x.Id == id).PreviousSong();
+                    }
+                    break;
+                case Commands.Stop:
+                    if (int.TryParse(args[1], out id))
+                    {
+                        Player.PlayLists.Find(x => x.Id == id).Stop();
+                    }
+                    break;
+                case Commands.Resume:
+                    if (int.TryParse(args[1], out id))
+                    {
+                        Player.PlayLists.Find(x => x.Id == id).Resume();
+                    }
+                    break;
+                case Commands.Unknown:
+
+                    break;
+            }
         }
     }
 }
