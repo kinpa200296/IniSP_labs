@@ -16,7 +16,7 @@ namespace ConsolePlayer
         public ConsoleFrame()
         {
             Title = new ScrollingString("<NoTitle>", ConsoleDisplayManager.FrameTitleDisplayLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             PageCount = 0;
             CurrentPage = 0;
             Height = 24;
@@ -26,7 +26,7 @@ namespace ConsolePlayer
         public ConsoleFrame(string title, int width, int height)
         {
             Title = new ScrollingString(title, ConsoleDisplayManager.FrameTitleDisplayLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             Width = width;
             Height = height;
             PageCount = 0;

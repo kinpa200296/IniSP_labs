@@ -7,15 +7,17 @@ namespace ConsolePlayer
     {
         static void Main(string[] args)
         {
-//            try
-//            {
+            try
+            {
                 Player.Launch(args);
-//            }
-//            catch (Exception)
-//           {
-//                Console.WriteLine(ConfigurationManager.ConnectionStrings["FatalError"]);
-//                Console.ReadKey();
-//           }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["UnhandledException"].ConnectionString,
+                        e.TargetSite.DeclaringType + "." + e.TargetSite.Name, e.Message);
+                Console.WriteLine(ConfigurationManager.ConnectionStrings["FatalError"]);
+                Console.ReadKey();
+            }
         }
     }
 }

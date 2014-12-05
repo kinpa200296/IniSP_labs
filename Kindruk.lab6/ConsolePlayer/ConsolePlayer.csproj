@@ -42,9 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands.cs" />
+    <Compile Include="CommandsManager.cs" />
     <Compile Include="ConsoleDisplayManager.cs" />
     <Compile Include="ConsoleFrame.cs" />
+    <Compile Include="LogManager.cs" />
+    <Compile Include="LogPageViewManager.cs" />
+    <Compile Include="MathExtension.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PlayerPlayList.cs" />
     <Compile Include="PlayerSong.cs" />

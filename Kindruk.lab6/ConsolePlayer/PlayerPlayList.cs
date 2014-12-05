@@ -22,7 +22,7 @@ namespace ConsolePlayer
             PlayerSongs.Clear();
             Data = new PlayList();
             Name = new ScrollingString(Data.Name, PlayListsPageViewManager.PlayListNameDisplayStringLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             Id = Player.GetNewPlayListId();
             CurrentSongIndex = -1;
             Play = false;
@@ -33,7 +33,7 @@ namespace ConsolePlayer
             PlayerSongs.Clear();
             Data = data;
             Name = new ScrollingString(Data.Name, PlayListsPageViewManager.PlayListNameDisplayStringLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             PlayerSongs.AddRange(Data.Songs.Select(x => new PlayerSong(x)));
             Id = Player.GetNewPlayListId();
             CurrentSongIndex = -1;
@@ -74,7 +74,7 @@ namespace ConsolePlayer
             }
         }
 
-        public void Stop()
+        public void Pause()
         {
             Play = false;
         }

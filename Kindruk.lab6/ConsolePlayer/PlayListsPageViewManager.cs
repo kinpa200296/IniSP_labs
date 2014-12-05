@@ -8,14 +8,12 @@ namespace ConsolePlayer
 {
     public static class PlayListsPageViewManager
     {
-        public static readonly string ScrollingStringSeparator =
-            ConfigurationManager.ConnectionStrings["ScrollingStringSeparator"].ConnectionString,
+        public static readonly string
             PlayListsSeparator = ConfigurationManager.ConnectionStrings["PlayListsSeparator"].ConnectionString,
             PlayListStateStringPlay = ConfigurationManager.ConnectionStrings["PlayListStateStringPlay"].ConnectionString,
-            PlayListStateStringStop = ConfigurationManager.ConnectionStrings["PlayListStateStringStop"].ConnectionString;
+            PlayListStateStringPause = ConfigurationManager.ConnectionStrings["PlayListStateStringPause"].ConnectionString;
 
-        public static int ScrollingStringUpdateFrequency,
-            NameDisplayStringLength,
+        public static int NameDisplayStringLength,
             PlayListNameDisplayStringLength,
             PerformerDisplayStringLength,
             GenreDisplayStringLength;
@@ -36,29 +34,28 @@ namespace ConsolePlayer
 
         public static int PageCount
         {
-            get { return Player.PlayLists.Count/PageSize + (Player.PlayLists.Count%PageSize == 0 ? 0 : 1) - 1; }
+            get { return Player.PlayLists.Count/PageSize + (Player.PlayLists.Count%PageSize == 0 ? 0 : 1); }
         }
 
         public static void Init()
         {
             var keys = new[]
             {
-                "PageSize", "ScrollingStringUpdateFrequency", "NameDisplayStringLength",
+                "PageSize", "NameDisplayStringLength",
                 "PlayListNameDisplayStringLength", "PerformerDisplayStringLength",
                 "GenreDisplayStringLength"
             };
             var values = keys.Select(x => int.Parse(ConfigurationManager.AppSettings[x])).ToArray();
             PageSize = values[0];
-            ScrollingStringUpdateFrequency = values[1];
-            NameDisplayStringLength = values[2];
-            PlayListNameDisplayStringLength = values[3];
-            PerformerDisplayStringLength = values[4];
-            GenreDisplayStringLength = values[5];
+            NameDisplayStringLength = values[1];
+            PlayListNameDisplayStringLength = values[2];
+            PerformerDisplayStringLength = values[3];
+            GenreDisplayStringLength = values[4];
         }
 
         public static void NextPage()
         {
-            CurrentPage = CurrentPage == PageCount ? PageCount : CurrentPage + 1;
+            CurrentPage = CurrentPage == PageCount - 1 ? PageCount - 1 : CurrentPage + 1;
         }
 
         public static void PreviousPage()
@@ -78,7 +75,7 @@ namespace ConsolePlayer
                         ConfigurationManager.ConnectionStrings["PlayListDisplayFormatString1"].ConnectionString,
                         Player.PlayLists[i].Name, Player.PlayLists[i].Data.Rating.ToString(CultureInfo.InvariantCulture),
                         Player.PlayLists[i].Id,
-                        Player.PlayLists[i].Play ? PlayListStateStringPlay : PlayListStateStringStop));
+                        Player.PlayLists[i].Play ? PlayListStateStringPlay : PlayListStateStringPause));
                 strings.Add(
                     string.Format(
                         ConfigurationManager.ConnectionStrings["PlayListDisplayFormatString2"].ConnectionString,

@@ -32,11 +32,11 @@ namespace ConsolePlayer
         public void ResetScrollingStrings()
         {
             Name = new ScrollingString(Data.Name, PlayListsPageViewManager.NameDisplayStringLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             Performer = new ScrollingString(Data.Performer, PlayListsPageViewManager.PerformerDisplayStringLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
             Genre = new ScrollingString(Data.Genre.ToString(), PlayListsPageViewManager.GenreDisplayStringLength,
-                PlayListsPageViewManager.ScrollingStringSeparator);
+                ConsoleDisplayManager.ScrollingStringSeparator);
         }
     }
 }

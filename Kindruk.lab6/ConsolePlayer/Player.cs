@@ -12,21 +12,27 @@ namespace ConsolePlayer
 
         public static readonly List<PlayerPlayList> PlayLists = new List<PlayerPlayList>();
 
+        public static LogManager Log;
+
         public static TimeSpan RefreshRate { get; private set; }
 
         public static void Launch(string[] playlists)
         {
-            try
+            using (Log = new LogManager())
             {
-                Init();
+                try
+                {
+                    Init();
+                }
+                catch (Exception e)
+                {
+                    Log.Add(string.Format(ConfigurationManager.ConnectionStrings["UnhandledException"].ConnectionString,
+                        e.TargetSite.DeclaringType + "." + e.TargetSite.Name, e.Message));
+                    throw new Exception(string.Format("{0} ◙♪ {1}", e.TargetSite.DeclaringType + "." + e.TargetSite.Name,
+                        e.Message));
+                }
+                Run();
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["UnhandledException"].ConnectionString,
-                    e.TargetSite.DeclaringType + "." + e.TargetSite.Name, e.Message);
-                throw new Exception("", e);
-            }
-            Run();
         }
 
         public static void Run()
