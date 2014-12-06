@@ -83,16 +83,6 @@ namespace ConsolePlayer
 
         public static void Launch()
         {
-            try
-            {
-                Init();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(ConfigurationManager.ConnectionStrings["UnhandledException"].ConnectionString,
-                    e.TargetSite.DeclaringType + "." + e.TargetSite.Name, e.Message);
-                throw new Exception("", e);
-            }
             Run();
         }
 
@@ -236,13 +226,61 @@ namespace ConsolePlayer
                     doRefresh = true;
                     continue;
                 }
-                if (key.Key == ConsoleKey.Q && key.Modifiers == ConsoleModifiers.Alt)
+                if (key.Modifiers == ConsoleModifiers.Alt)
                 {
-                    work = false;
-                    return false;
+                    switch (key.Key)
+                    {
+                        case ConsoleKey.Q:
+                        case ConsoleKey.F4:
+                            work = false;
+                            return false;
+                        case ConsoleKey.OemComma:
+                        case ConsoleKey.F6:
+                            stringBuilder.Append(Commands.Prev + " ");
+                            CursorPosition += Commands.Prev.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.OemPeriod:
+                        case ConsoleKey.F8:
+                            stringBuilder.Append(Commands.Next + " ");
+                            CursorPosition += Commands.Next.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.F7:
+                            stringBuilder.Append(Commands.Restart + " ");
+                            CursorPosition += Commands.Restart.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.L:
+                            stringBuilder.Append(Commands.Load + " ");
+                            CursorPosition += Commands.Load.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.K:
+                            stringBuilder.Append(Commands.Kill + " ");
+                            CursorPosition += Commands.Kill.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.S:
+                            stringBuilder.Append(Commands.Sort + " ");
+                            CursorPosition += Commands.Sort.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.P:
+                            stringBuilder.Append(Commands.Pause + " ");
+                            CursorPosition += Commands.Pause.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.R:
+                            stringBuilder.Append(Commands.Resume + " ");
+                            CursorPosition += Commands.Resume.ToString().Length + 1;
+                            continue;
+                        case ConsoleKey.H:
+                        case ConsoleKey.F1:
+                            stringBuilder.Append(Commands.Help);
+                            CursorPosition += Commands.Help.ToString().Length;
+                            continue;
+                    }
                 }
                 switch (key.Key)
                 {
+                    case ConsoleKey.F1:
+                        stringBuilder.Append(Commands.Help);
+                        CursorPosition += Commands.Help.ToString().Length;
+                        continue;
                     case ConsoleKey.LeftArrow:
                         CursorPosition = (CursorPosition - 1) >= 0 ? CursorPosition - 1 : CursorPosition;
                         continue;
@@ -293,6 +331,7 @@ namespace ConsolePlayer
                 }
                 if (CursorPosition + 1 == ConsoleBufferHeight*ConsoleBufferWidth )
                     continue;
+                if (key.KeyChar == 0) continue;
                 stringBuilder.Insert(CursorPosition, key.KeyChar);
                 CursorPosition++;
             }

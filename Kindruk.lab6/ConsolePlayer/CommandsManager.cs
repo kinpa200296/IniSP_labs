@@ -8,7 +8,12 @@ namespace ConsolePlayer
 {
     enum Commands
     {
-        Unknown, Load, Kill, Next, Prev, Pause, Resume
+        Unknown, Load, Kill, Next, Prev, Pause, Resume, Restart, Sort, Help
+    }
+
+    enum SortMethod
+    {
+        Unknown, Rating, Random
     }
 
     public static class CommandsManager
@@ -18,6 +23,9 @@ namespace ConsolePlayer
 
         public static void ManageCommand(string command)
         {
+            if (string.IsNullOrWhiteSpace(command))
+                return;
+            Player.Log.Add(string.Format(">>> {0}", command));
             var args = command.Split(CommandSeparators.ToCharArray()).Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
             Commands commandType;
             if (!Enum.TryParse(args[0], true, out commandType))
@@ -44,6 +52,15 @@ namespace ConsolePlayer
                 case Commands.Resume:
                     ResumePlayList(command, args);
                     break;
+                case Commands.Restart:
+                    RestartCurrentSongInPlayList(command, args);
+                    break;
+                case Commands.Sort:
+                    SortPlayList(command, args);
+                    break;
+                case Commands.Help:
+                    ShowHelp(command, args);
+                    break;
                 case Commands.Unknown:
                     UnknownCommand(command);
                     break;
@@ -52,7 +69,7 @@ namespace ConsolePlayer
 
         public static void LoadPlayList(string command, string[] args)
         {
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -87,7 +104,7 @@ namespace ConsolePlayer
         public static void KillPlayList(string command, string[] args)
         {
             int id;
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -117,7 +134,7 @@ namespace ConsolePlayer
         public static void NextSongInPlayList(string command, string[] args)
         {
             int id;
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -146,7 +163,7 @@ namespace ConsolePlayer
         public static void PreviousSongInPlayList(string command, string[] args)
         {
             int id;
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -175,7 +192,7 @@ namespace ConsolePlayer
         public static void PausePlayList(string command, string[] args)
         {
             int id;
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -204,7 +221,7 @@ namespace ConsolePlayer
         public static void ResumePlayList(string command, string[] args)
         {
             int id;
-            if (args.Length > 2)
+            if (args.Length != 2)
             {
                 Player.Log.Add(
                     string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
@@ -228,6 +245,123 @@ namespace ConsolePlayer
             else
                 Player.Log.Add(string.Format(
                     ConfigurationManager.ConnectionStrings["InvalidId"].ConnectionString, args[1]));
+        }
+
+        public static void RestartCurrentSongInPlayList(string command, string[] args)
+        {
+            int id;
+            if (args.Length != 2)
+            {
+                Player.Log.Add(
+                    string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
+                        command));
+                return;
+            }
+            if (int.TryParse(args[1], out id))
+            {
+                var playList = Player.PlayLists.Find(x => x.Id == id);
+                if (playList == null)
+                {
+                    Player.Log.Add(string.Format(
+                        ConfigurationManager.ConnectionStrings["InvalidId"].ConnectionString, args[1]));
+                    return;
+                }
+                playList.RestartCurrentSong();
+                Player.Log.Add(string.Format(
+                    ConfigurationManager.ConnectionStrings["PlayListCurrentSongRestart"].ConnectionString,
+                    playList.CurrentSong.Data.Name, playList.Data.Name, playList.Id));
+            }
+            else
+                Player.Log.Add(string.Format(
+                    ConfigurationManager.ConnectionStrings["InvalidId"].ConnectionString, args[1]));
+        }
+
+        public static void SortPlayList(string command, string[] args)
+        {
+            int id;
+            if (args.Length != 3 && args.Length != 2)
+            {
+                Player.Log.Add(
+                    string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
+                        command));
+                return;
+            }
+            if (int.TryParse(args[1], out id))
+            {
+                var playList = Player.PlayLists.Find(x => x.Id == id);
+                if (playList == null)
+                {
+                    Player.Log.Add(string.Format(
+                        ConfigurationManager.ConnectionStrings["InvalidId"].ConnectionString, args[1]));
+                    return;
+                }
+                SortMethod sortMethod;
+                if (args.Length == 2)
+                {
+                    sortMethod = SortMethod.Rating;
+                }
+                else if (!Enum.TryParse(args[2], true, out sortMethod))
+                {
+                    sortMethod = SortMethod.Unknown;
+                }
+                switch (sortMethod)
+                {
+                    case SortMethod.Rating:
+                        playList.SortSongsByRating();
+                        Player.Log.Add(
+                            string.Format(ConfigurationManager.ConnectionStrings["PlayListSortRating"].ConnectionString,
+                                playList.Data.Name, playList.Id));
+                        break;
+                    case SortMethod.Random:
+                        playList.SwapSongsRandomly();
+                        Player.Log.Add(
+                            string.Format(ConfigurationManager.ConnectionStrings["PlayListSortRandom"].ConnectionString,
+                                playList.Data.Name, playList.Id));
+                        break;
+                    case  SortMethod.Unknown:
+                        Player.Log.Add(
+                            string.Format(ConfigurationManager.ConnectionStrings["SortMethodUnknown"].ConnectionString,
+                                args[2]));
+                        break;
+                }
+            }
+            else
+                Player.Log.Add(string.Format(
+                    ConfigurationManager.ConnectionStrings["InvalidId"].ConnectionString, args[1]));
+        }
+
+        public static void ShowHelp(string command, string[] args)
+        {
+            if (args.Length > 1)
+            {
+                Player.Log.Add(
+                    string.Format(ConfigurationManager.ConnectionStrings["UnknownCommand"].ConnectionString,
+                        command));
+                return;
+            }
+            if (File.Exists(ConfigurationManager.ConnectionStrings["HelpFile"].ConnectionString))
+            {
+                using (
+                    var file = new FileStream(ConfigurationManager.ConnectionStrings["HelpFile"].ConnectionString,
+                        FileMode.Open))
+                {
+                    using (var reader = new StreamReader(file))
+                    {
+                        var s = reader.ReadLine();
+                        while (s != null)
+                        {
+                            Player.Log.Add(s);
+                            s = reader.ReadLine();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Player.Log.Add(string.Format(
+                    ConfigurationManager.ConnectionStrings["NoFileFound"].ConnectionString,
+                    ConfigurationManager.ConnectionStrings["HelpFile"].ConnectionString));
+            }
         }
 
         public static void UnknownCommand(string command)

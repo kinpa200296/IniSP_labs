@@ -8,7 +8,7 @@ namespace ConsolePlayer
 {
     public class PlayerPlayList
     {
-        public readonly List<PlayerSong> PlayerSongs = new List<PlayerSong>();
+        public List<PlayerSong> PlayerSongs = new List<PlayerSong>();
         public PlayList Data { get; private set; }
         public int Id { get; private set; }
         public int CurrentSongIndex { get; private set; }
@@ -102,6 +102,41 @@ namespace ConsolePlayer
                         ? PlayerSongs.Count - 1
                         : CurrentSongIndex - 1;
             }
+        }
+
+        public void RestartCurrentSong()
+        {
+            lock (CurrentSong)
+            {
+                CurrentSong.TimePlayed = new TimeSpan(0);
+            }
+        }
+
+        public void SwapSongsRandomly()
+        {
+            var random = new Random();
+            var songs = PlayerSongs.OrderBy(x => random.Next());
+            foreach (var song in songs)
+            {
+                song.ResetScrollingStrings();
+                song.TimePlayed = new TimeSpan(0);
+            }
+            var playerSongs = new List<PlayerSong>(songs);
+            PlayerSongs = playerSongs;
+            CurrentSongIndex = 0;
+        }
+
+        public void SortSongsByRating()
+        {
+                var songs = PlayerSongs.OrderByDescending(x => x.Data.Rating);
+                foreach (var song in songs)
+                {
+                    song.ResetScrollingStrings();
+                    song.TimePlayed = new TimeSpan(0);
+                }
+            var playerSongs = new List<PlayerSong>(songs);
+            PlayerSongs = playerSongs;
+            CurrentSongIndex = 0;
         }
     }
 }

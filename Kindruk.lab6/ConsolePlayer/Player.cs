@@ -31,6 +31,10 @@ namespace ConsolePlayer
                     throw new Exception(string.Format("{0} ◙♪ {1}", e.TargetSite.DeclaringType + "." + e.TargetSite.Name,
                         e.Message));
                 }
+                foreach (var playlist in playlists)
+                {
+                    CommandsManager.LoadPlayList("", new[] { Commands.Load.ToString(), playlist});
+                }
                 Run();
             }
         }
@@ -49,6 +53,7 @@ namespace ConsolePlayer
             };
             var values = keys.Select(x => int.Parse(ConfigurationManager.AppSettings[x])).ToArray();
             RefreshRate = new TimeSpan(0, 0, 0, 0, values[0]);
+            ConsoleDisplayManager.Init();
         }
 
         public static int GetNewSongId()
