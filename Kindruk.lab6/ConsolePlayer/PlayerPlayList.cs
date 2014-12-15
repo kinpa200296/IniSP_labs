@@ -62,9 +62,7 @@ namespace ConsolePlayer
                 if (PlayerSongs[CurrentSongIndex].TimePlayed >= PlayerSongs[CurrentSongIndex].Data.Length)
                 {
                     PlayerSongs[CurrentSongIndex].TimePlayed = new TimeSpan(0);
-                    CurrentSongIndex = CurrentSongIndex == PlayerSongs.Count
-                        ? 0
-                        : CurrentSongIndex + 1;
+                    NextSong();
 
                 }
                 else

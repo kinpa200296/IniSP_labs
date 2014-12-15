@@ -31,7 +31,7 @@ namespace ConsolePlayer
 
         public static void NextPage()
         {
-            CurrentPage = CurrentPage == PageCount - 1 ? PageCount - 1 : CurrentPage + 1;
+            CurrentPage = CurrentPage >= PageCount - 1 ? Math.Max(PageCount - 1, 0) : CurrentPage + 1;
         }
 
         public static void PreviousPage()

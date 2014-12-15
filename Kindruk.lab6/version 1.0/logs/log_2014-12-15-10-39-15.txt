@@ -1,0 +1,31 @@
+>>> Help
+This is help file for ConsolePlayer
+Commands:
+Help
+Load <filename> - Loads specified file if it is a valid playlist
+Kill <playlist id> - Stops specified playlist and unloads it from program
+Pause <playlist id> - Pauses specified playlist
+Resume <playlist id> - Resumes specified playlist
+Prev <playlist id> - Switches to previous song in specified playlist
+Next <playlist id> - Switches to next song in specified playlist
+Restart <playlist id> - Plays current song in specified playlist from the begining
+Sort <playlist id> Random -  Sorts songs in specified playlist randomly
+Sort <playlist id> Rating - Sorts songs in specified playlist by rating
+HotKeys:
+<alt+f1> or <alt+h> or <f1> - adds "Help " to command line
+<alt+f4> or <alt+q> - exit
+<alt+f6> or <alt+,> - adds "Prev " to command line
+<alt+f8> or <alt+.> - adds "Next " to command line
+<alt+f7> - adds "Restart " to command line
+<alt+L>- adds "Load " to command line
+<alt+K>- adds "Kill " to command line
+<alt+S>- adds "Sort " to command line
+<alt+P>- adds "Pause " to command line
+<alt+R>- adds "Resume " to command line
+Controls:
+<ctrl+→> - Switch to next page of playlists
+<ctrl+←> - Switch to previous page of playlists
+<ctrl+shift+→> - Switch to next page of log
+<ctrl+shift+←> - Switch to previous page of log
+>>> load lpf.pls
+Playlist LP Favorites with id 0 loaded from file "lpf.pls"

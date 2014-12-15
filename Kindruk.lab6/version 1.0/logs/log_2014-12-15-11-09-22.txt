@@ -1,0 +1,2 @@
+Playlist 05 - Collision Course (feat. Jay-Z) (2004) with id 0 loaded from file "course.pls"
+Playlist 05 - Collision Course (feat. Jay-Z) (Clean) (2004) with id 1 loaded from file "course_clean.pls"
