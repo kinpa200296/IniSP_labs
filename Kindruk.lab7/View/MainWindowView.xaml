@@ -1,0 +1,125 @@
+﻿<Window x:Class="Kindruk.lab7.View.MainWindowView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:Kindruk.lab7.ViewModel"
+        Title="Анкета студента" Height="415" Width="775" Background="White" ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+    <Window.Resources>
+        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="DarkRed" />
+        <Style x:Key="Normal" TargetType="ListBoxItem">
+            <Setter Property="Background" Value="Cornsilk" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="Padding" Value="3" />
+            <Setter Property="FontSize" Value="14" />
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="Button" TargetType="Button">
+            <Setter Property="Background" Value="Cornsilk" />
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+
+
+        <Style x:Key="Input" TargetType="TextBox">
+            <Setter Property="Background" Value="WhiteSmoke" />
+            <Setter Property="Padding" Value="1" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="BorderBrush" Value="AntiqueWhite" />
+            <Setter Property="BorderThickness" Value="3" />
+        </Style>
+    </Window.Resources>
+    <Grid Name="StudentData">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="515" />
+            <ColumnDefinition Width="260" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Анкета студента" TextAlignment="Center" FontSize="25px" />
+        <GridSplitter Grid.Row="1"  Grid.ColumnSpan="2" Grid.Column="0" Height="5" Background="Gray" Width="775" />
+        <StackPanel DataContext="{Binding SelectedItem, ElementName=ModelsList}" Grid.Row="2"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <TextBlock Text="Имя:" FontSize="20px" Margin="5px" Width="100"/>
+            <TextBox Text="{Binding FirstName, TargetNullValue=[Описание не предоставлено], UpdateSourceTrigger=PropertyChanged}" Name="StudentFirstName" HorizontalAlignment="Right" FontSize="20px" Width="375" MaxLength="20" ToolTip="Введите имя студента!" Style="{StaticResource Input}"/>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedItem, ElementName=ModelsList}" Grid.Row="3"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <TextBlock Text="Фамилия:" FontSize="20px" Margin="5px" Width="100"/>
+            <TextBox  Text="{Binding LastName, TargetNullValue=[Описание не предоставлено], UpdateSourceTrigger=PropertyChanged}" Name="StudentLastName" HorizontalAlignment="Right"  FontSize="20px" Width="375" MaxLength="20" ToolTip="Введите фамилию студента!" Style="{StaticResource Input}"/>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedItem, ElementName=ModelsList}" Grid.Row="4"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <TextBlock Text="Факультет:" FontSize="20px" Margin="5px" Width="100"/>
+            <TextBox  Text="{Binding Faculty, TargetNullValue=[Описание не предоставлено], UpdateSourceTrigger=PropertyChanged}" Name="StudentFaculty" HorizontalAlignment="Right"  FontSize="20px" Width="375" MaxLength="20" ToolTip="Введите факультет студента!" Style="{StaticResource Input}"/>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedItem, ElementName=ModelsList}" Grid.Row="5"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <TextBlock Text="Группа:" FontSize="20px" Margin="5px" Width="100"/>
+            <TextBox  Text="{Binding GroupNumber, TargetNullValue=[Описание не предоставлено], UpdateSourceTrigger=PropertyChanged}"  Name="StudentGroupNumber" HorizontalAlignment="Right"  FontSize="20px" Width="375"  MaxLength="6" ToolTip="Введите группу студента!" Style="{StaticResource Input}"/>
+        </StackPanel>
+        <StackPanel DataContext="{Binding SelectedItem, ElementName=ModelsList}" Grid.Row="6"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <TextBlock Text="Билет:" FontSize="20px" Margin="5px" Width="100"/>
+            <TextBox  Text="{Binding StudentCard, Mode=TwoWay, TargetNullValue=[Описание не предоставлено], UpdateSourceTrigger=PropertyChanged}"  Name="StudentCard" HorizontalAlignment="Right"  FontSize="20px" Width="375" MaxLength="10" ToolTip="Введите номер студенческого билета студента!"  Style="{StaticResource Input}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="7"  Grid.Column="0" Orientation="Horizontal" Margin="10px">
+            <Button Name="SaveToFile" Command="{Binding SaveToFile}" Style="{StaticResource Button}" Content="Сохранить в файл">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="brd" BorderBrush="Blue" BorderThickness="2" CornerRadius="2" Background="Yellow">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="brd" Property="Background" Value="WhiteSmoke" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Name="LoadFromFile" Command="{Binding LoadFromFile}" Margin="5 0 0 0" Style="{StaticResource Button}" Content="Загрузить из файла">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="brd" BorderBrush="Blue" BorderThickness="2" CornerRadius="2" Background="Yellow">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="brd" Property="Background" Value="WhiteSmoke" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <Button Name="AddStudent" Command="{Binding AddStudent}" Margin="5 0 0 0" Style="{StaticResource Button}" Content="Добавить">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Name="brd" BorderBrush="Blue" BorderThickness="2" CornerRadius="2" Background="Yellow">
+                            <ContentPresenter Margin="{TemplateBinding Padding}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="brd" Property="Background" Value="WhiteSmoke" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
+        <ListBox Name="ModelsList" SelectedItem="{Binding CurrentStudent}" Grid.Column="1" Grid.Row="1" Grid.RowSpan="7" Margin="0 5 5 5" Width="240" DisplayMemberPath="FirstName" ItemContainerStyle="{StaticResource Normal}" ItemsSource="{Binding StudentsModels}"/>
+    </Grid>
+</Window>
